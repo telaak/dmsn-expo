@@ -7,20 +7,18 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MaterialIcons } from '@expo/vector-icons'
-import { Link } from '@react-navigation/native';
+import { MaterialIcons } from "@expo/vector-icons";
+import { Link } from "@react-navigation/native";
 import { ContactList } from "./screens/ContactList";
+import * as ScreenOrientation from 'expo-screen-orientation';
+ScreenOrientation.unlockAsync()
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
 function Feed() {
-  return (
-    <View>
-      
-    </View>
-  );
+  return <View></View>;
 }
 
 function Messages() {
@@ -34,20 +32,27 @@ function Messages() {
 
 function Profile() {
   return (
-   <View></View>
+    <View>
+      <Text>Test3</Text>
+    </View>
   );
 }
 
 function Profile2() {
   return (
-   <View><Text>Test</Text></View>
+    <View>
+      <Text>Test</Text>
+    </View>
   );
 }
 
-function Settings( { navigation } ) {
+function Settings({ navigation }) {
   return (
     <View>
-      <Button title="Test button" onPress={() => navigation.navigate('TestScreen')} />
+      <Button
+        title="Test button"
+        onPress={() => navigation.navigate("TestScreen")}
+      />
     </View>
   );
 }
@@ -56,20 +61,20 @@ function Home() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Feed"
-        component={Feed}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={24} color="black" />
-          ),
-        }}
-      />
-      <Tab.Screen 
         name="Contacts"
         component={ContactList}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="list" size={24} color="black" />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Feed"
+        component={Feed}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={24} color="black" />
           ),
         }}
       />
@@ -89,26 +94,26 @@ function Home() {
 const TestScreen = () => {
   return (
     <View>
-         <Link to={{ screen: 'TestScreena', params: { id: 'jane' } }}>
-      Go to Jane's profile
-    </Link>
+      <Link to={{ screen: "TestScreena", params: { id: "jane" } }}>
+        Go to Jane's profile
+      </Link>
     </View>
-  )
-}
+  );
+};
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="TestScreen" component={TestScreen} />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="TestScreen" component={TestScreen} />
+        </Stack.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
   );
 }
 
