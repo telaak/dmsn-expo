@@ -12,7 +12,13 @@ import { Link } from "@react-navigation/native";
 import { ContactList } from "./screens/ContactList";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { ContactEdit } from "./screens/ContactEdit";
-ScreenOrientation.unlockAsync()
+
+ScreenOrientation.getPlatformOrientationLockAsync().then(orientation => {
+  if (!orientation.screenOrientationLockWeb) {
+    ScreenOrientation.unlockAsync()
+  }
+})
+ 
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

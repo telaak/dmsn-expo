@@ -3,7 +3,7 @@ import { View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
 import { TextInput } from "react-native-paper";
 import { List } from "react-native-paper";
 import * as ScreenOrientation from "expo-screen-orientation";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export interface IContact {
   name: string;
@@ -81,65 +81,11 @@ export function ContactEdit({ route, navigation }) {
             )}
             left={() => <List.Icon icon="phone" />}
           />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
-               <List.Item
-            title={() => (
-              <TextInputComponent
-                label="Phone Number"
-                value={data.phoneNumber}
-              />
-            )}
-            left={() => <List.Icon icon="phone" />}
-          />
           <List.Subheader>Messages</List.Subheader>
           {data.messages.map((message, i) => {
             return (
               <List.Item
-              key={i}
+                key={i}
                 title={() => (
                   <TextInputComponent
                     label={message.time}
