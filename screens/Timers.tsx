@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { LayoutAnimation, ScrollView, UIManager, View } from "react-native";
 import { List } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text } from "react-native-paper";
@@ -68,8 +68,11 @@ const messages = [
 
 const CountdownTimer = ({ targetDate }) => {
   const [days, hours, minutes, seconds] = useCountdown(targetDate);
-  const [expanded, setExpanded] = React.useState(true);
-  const handlePress = () => setExpanded(!expanded);
+  const [expanded, setExpanded] = React.useState(false);
+  const handlePress = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded(!expanded);
+  } 
 
   return (
     <ScrollView>
