@@ -12,20 +12,25 @@ import { Link } from "@react-navigation/native";
 import { ContactList } from "./screens/ContactList";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { ContactEdit } from "./screens/ContactEdit";
+import { Timers } from "./screens/Timers";
+import { Provider, DefaultTheme } from "react-native-paper";
 
-ScreenOrientation.getPlatformOrientationLockAsync().then(orientation => {
+ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   if (!orientation.screenOrientationLockWeb) {
-    ScreenOrientation.unlockAsync()
+    ScreenOrientation.unlockAsync();
   }
-})
- 
+});
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
 function Feed() {
-  return <View></View>;
+  return (
+    <View>
+      <Timers></Timers>
+    </View>
+  );
 }
 
 function Messages() {
@@ -68,20 +73,20 @@ function Home() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Contacts"
-        component={ContactList}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="list" size={24} color="black" />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Feed"
         component={Feed}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" size={24} color="black" />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Contacts"
+        component={ContactList}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="list" size={24} color="black" />
           ),
         }}
       />
@@ -108,24 +113,35 @@ const TestScreen = () => {
   );
 };
 
+const linking = {
+  prefixes: [],
+  config: {
+    screens: {
+      Home: "/Home",
+    },
+  },
+};
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="TestScreen" component={TestScreen} />
-        <Stack.Screen
-          name="ContactEdit"
-          options={({ route }) => ({ title: route.params.data.name })}
-          component={ContactEdit}
-        />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <Provider theme={DefaultTheme}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="TestScreen" component={TestScreen} />
+          <Stack.Screen
+            name="ContactEdit"
+            options={({ route }) => ({ title: route.params.data.name })}
+            component={ContactEdit}
+          />
+        </Stack.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </Provider>
   );
 }
 
