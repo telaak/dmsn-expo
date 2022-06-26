@@ -15,6 +15,7 @@
     "@react-navigation/material-top-tabs": "^6.2.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
+    "dayjs": "^1.11.3",
     "expo": "~45.0.0",
     "expo-clipboard": "~3.0.1",
     "expo-screen-orientation": "~4.2.0",
