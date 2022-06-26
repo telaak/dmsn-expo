@@ -10,7 +10,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "@react-navigation/native";
 import { ContactList } from "./screens/ContactList";
-import * as ScreenOrientation from 'expo-screen-orientation';
+import * as ScreenOrientation from "expo-screen-orientation";
+import { ContactEdit } from "./screens/ContactEdit";
 ScreenOrientation.unlockAsync()
 
 const Tab = createBottomTabNavigator();
@@ -103,17 +104,22 @@ const TestScreen = () => {
 
 export default function App() {
   return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="TestScreen" component={TestScreen} />
-        </Stack.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="TestScreen" component={TestScreen} />
+        <Stack.Screen
+          name="ContactEdit"
+          options={({ route }) => ({ title: route.params.data.name })}
+          component={ContactEdit}
+        />
+      </Stack.Navigator>
+      <StatusBar style="auto" />
+    </NavigationContainer>
   );
 }
 

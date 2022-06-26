@@ -1,93 +1,58 @@
 import React from "react";
-import { View, Text, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableHighlight,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Pressable,
+} from "react-native";
 import { DataTable } from "react-native-paper";
 import { useSortBy, useTable } from "react-table";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 
 const numberOfItemsPerPageList = [1, 2, 3, 4];
 
-export function ContactList() {
+export function ContactList( { navigation } ) {
   const data = React.useMemo(
     () => [
       {
         name: "Test name A",
         email: "test@test.fi",
-        phoneNumber: "0595958",
+        phoneNumber: "0449708811",
+        _id: '152521521',
+        messages: [
+            {
+                time: '3d',
+                content: 'Goodbye cruel world'
+            },
+            {
+                time: '9d',
+                content: 'I lied'
+            },
+            {
+                time: '12d',
+                content: 'Or not'
+            }
+        ]
       },
       {
         name: "Test name B",
         email: "test@test.fi",
         phoneNumber: "0595958",
-      },
-      {
-        name: "Test name C",
-        email: "test@test.fi",
-        phoneNumber: "1595958",
-      },
-      {
-        name: "Test name D",
-        email: "test@test.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name F",
-        email: "test@test.fi",
-        phoneNumber: "2595958",
-      },
-      {
-        name: "Test name E",
-        email: "test@test.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
-      },
-      {
-        name: "Test name",
-        email: "test@teasdadsadsadsdasst.fi",
-        phoneNumber: "0595958",
+        _id: '53t5239ufas',
+        messages: [
+            {
+                time: '3d',
+                content: 'Goodbye cruel world'
+            },
+            {
+                time: '9d',
+                content: 'I lied'
+            }
+        ]
       },
     ],
     []
@@ -159,15 +124,22 @@ export function ContactList() {
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <DataTable.Row {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return (
-                  <DataTable.Cell {...cell.getCellProps()}>
-                    {cell.render("Cell")}
-                  </DataTable.Cell>
-                );
-              })}
-            </DataTable.Row>
+            <Pressable key={i} onLongPress={() => {
+                navigation.navigate('ContactEdit', { data: row.original })
+            }}>
+              <DataTable.Row {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return (
+                    <DataTable.Cell {...cell.getCellProps()}>
+                      <Text
+                      >
+                        {cell.value}
+                      </Text>
+                    </DataTable.Cell>
+                  );
+                })}
+              </DataTable.Row>
+            </Pressable>
           );
         })}
       </DataTable>
