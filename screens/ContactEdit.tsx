@@ -18,10 +18,6 @@ export interface IContact {
   ];
 }
 
-interface TextInputProps {
-  label: string;
-}
-
 const TextInputComponent = (props) => {
   const [text, setText] = React.useState(props.value);
 
@@ -38,24 +34,6 @@ const TextInputComponent = (props) => {
 
 export function ContactEdit({ route, navigation }) {
   const { data }: { data: IContact } = route.params;
-  const [verticalOffset, setVerticalOffset] = React.useState(65);
-
-  /*  const orientationListener = ScreenOrientation.addOrientationChangeListener((listener) => {
-    switch (listener.orientationInfo.orientation) {
-      case ScreenOrientation.Orientation.PORTRAIT_UP:
-      case ScreenOrientation.Orientation.PORTRAIT_DOWN:
-        setVerticalOffset(65);
-        console.log(`portrait: ${verticalOffset}`);
-        break;
-      case ScreenOrientation.Orientation.LANDSCAPE_LEFT:
-      case ScreenOrientation.Orientation.LANDSCAPE_RIGHT:
-        setVerticalOffset(35);
-        console.log(`landscape: ${verticalOffset}`);
-        break;
-      default:
-        break;
-    }
-  }); */
 
   return (
     <KeyboardAwareScrollView>
