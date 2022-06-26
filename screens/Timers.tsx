@@ -1,37 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { LayoutAnimation, ScrollView, UIManager, View } from "react-native";
-import { List } from "react-native-paper";
+import { Button, List } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text } from "react-native-paper";
-
-const useCountdown = (targetDate) => {
-  const countDownDate = new Date(targetDate).getTime();
-
-  const [countDown, setCountDown] = useState(
-    countDownDate - new Date().getTime()
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountDown(countDownDate - new Date().getTime());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [countDownDate]);
-
-  return getReturnValues(countDown);
-};
-
-const getReturnValues = (countDown) => {
-  const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(
-    (countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
-  const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
-
-  return [days, hours, minutes, seconds];
-};
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
 
 const messages = [
   {
@@ -66,26 +42,26 @@ const messages = [
   },
 ];
 
-const CountdownTimer = ({ targetDate }) => {
-  const [days, hours, minutes, seconds] = useCountdown(targetDate);
+const twelve = dayjs().add(12, "hours");
+
+const AccordionList = ({
+  targetDate,
+  messages,
+}: {
+  targetDate: dayjs.Dayjs;
+  messages: any;
+}) => {
   const [expanded, setExpanded] = React.useState(false);
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
-  } 
+  };
 
   return (
     <ScrollView>
       <List.Section title="Timers">
         <List.Accordion
-          title={
-            <ShowCounter
-              days={days}
-              hours={hours}
-              minutes={minutes}
-              seconds={seconds}
-            />
-          }
+          title={<CountdownTimer targetDate={targetDate} />}
           left={(props) => <List.Icon {...props} icon="clock" />}
           expanded={expanded}
           onPress={handlePress}
@@ -104,45 +80,24 @@ const CountdownTimer = ({ targetDate }) => {
       </List.Section>
     </ScrollView>
   );
+};
 
-  /* if (days + hours + minutes + seconds <= 0) {
-    return <View></View>;
-  } else {
-    return (
-      <ShowCounter
-        days={days}
-        hours={hours}
-        minutes={minutes}
-        seconds={seconds}
-      />
-    );
-  } */
+const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
+  const [target, setTarget] = React.useState(targetDate.diff(dayjs()));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTarget(targetDate.diff(dayjs()));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <Text>{dayjs.duration(target).format("HH[h] mm[m] ss[s]")}</Text>;
 };
 
 export function Timers() {
-  return <CountdownTimer targetDate={new Date().getTime() + 500000} />;
+  return (
+    <AccordionList targetDate={twelve} messages={messages}></AccordionList>
+  );
 }
-
-const ShowCounter = ({ days, hours, minutes, seconds }) => {
-  return (
-    <Text>
-      {days}d {hours}h {minutes}m {seconds}s
-    </Text>
-  );
-};
-
-const DateTimeDisplay = ({
-  value,
-  type,
-  isDanger,
-}: {
-  value: number;
-  type: string;
-  isDanger: boolean;
-}) => {
-  return (
-    <View>
-      <Text>{value + type}</Text>
-    </View>
-  );
-};
