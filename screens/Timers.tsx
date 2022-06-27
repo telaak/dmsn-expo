@@ -17,7 +17,7 @@ const AccordionList = ({
   targetDate: dayjs.Dayjs;
   messages: any;
 }) => {
-  const [expanded, setExpanded] = React.useState(true);
+  const [expanded, setExpanded] = React.useState(false);
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
@@ -41,13 +41,27 @@ const AccordionList = ({
                   justifyContent: "space-evenly",
                 }}
               >
-                <MaterialIcons size={24} name='email' style={m.emailEnabled ? {} : { opacity: 0 }} />
-                <MaterialIcons size={24} name='message' style={m.smsEnabled ? {} : { opacity: 0 }} />
+                <MaterialIcons
+                  size={24}
+                  name="email"
+                  style={m.emailEnabled ? {} : { opacity: 0 }}
+                />
+                <MaterialIcons
+                  size={24}
+                  name="message"
+                  style={m.smsEnabled ? {} : { opacity: 0 }}
+                />
+              </View>
+            )}
+            left={(props) => (
+              <View style={{ opacity: 0 }}>
+                <List.Icon {...props} icon="subdirectory-arrow-right" />
               </View>
             )}
             key={i}
             title={m.recipient}
-            description={m.content}
+            description={m.content.repeat(50)}
+            descriptionNumberOfLines={3}
           />
         );
       })}
@@ -81,8 +95,8 @@ function TimersList({ contacts }) {
             content: m.content,
             recipient: c.name,
             emailEnabled: c.emailEnabled,
-            smsEnabled: c.smsEnabled
-        });
+            smsEnabled: c.smsEnabled,
+          });
         }
       });
     });
@@ -92,13 +106,12 @@ function TimersList({ contacts }) {
     };
   });
 
-  console.log(durationMessages);
-
   return (
     <ScrollView>
       <List.Section title="Timers">
-        {durationMessages.map((dm) => (
+        {durationMessages.map((dm, i) => (
           <AccordionList
+            key={i}
             messages={dm.messages}
             targetDate={dayjs().add(dayjs.duration(dm.duration))}
           />
