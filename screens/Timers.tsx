@@ -6,43 +6,9 @@ import { Text } from "react-native-paper";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
+import { ContactContext } from "../App";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
-
-const messages = [
-  {
-    type: "email",
-    recipient: "Recipient 1",
-    content: "content",
-  },
-  {
-    type: "message",
-    recipient: "Recipient 2",
-    content: "content",
-  },
-  {
-    type: "email",
-    recipient: "Recipient 3",
-    content: "content",
-  },
-  {
-    type: "email",
-    recipient: "Recipient 3",
-    content: "content",
-  },
-  {
-    type: "email",
-    recipient: "Recipient 3",
-    content: "content",
-  },
-  {
-    type: "email",
-    recipient: "Recipient 3",
-    content: "content",
-  },
-];
-
-const twelve = dayjs().add(12, "hours");
 
 const AccordionList = ({
   targetDate,
@@ -51,34 +17,41 @@ const AccordionList = ({
   targetDate: dayjs.Dayjs;
   messages: any;
 }) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(true);
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
   };
 
   return (
-    <ScrollView>
-      <List.Section title="Timers">
-        <List.Accordion
-          title={<CountdownTimer targetDate={targetDate} />}
-          left={(props) => <List.Icon {...props} icon="clock" />}
-          expanded={expanded}
-          onPress={handlePress}
-        >
-          {messages.map((m, i) => {
-            return (
-              <List.Item
-                right={(props) => <List.Icon {...props} icon={m.type} />}
-                key={i}
-                title={m.recipient}
-                description={m.content.repeat(50)}
-              />
-            );
-          })}
-        </List.Accordion>
-      </List.Section>
-    </ScrollView>
+    <List.Accordion
+      title={<CountdownTimer targetDate={targetDate} />}
+      left={(props) => <List.Icon {...props} icon="clock" />}
+      expanded={expanded}
+      onPress={handlePress}
+    >
+      {messages.map((m, i) => {
+        return (
+          <List.Item
+            right={(props) => (
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <MaterialIcons size={24} name='email' style={m.emailEnabled ? {} : { opacity: 0 }} />
+                <MaterialIcons size={24} name='message' style={m.smsEnabled ? {} : { opacity: 0 }} />
+              </View>
+            )}
+            key={i}
+            title={m.recipient}
+            description={m.content}
+          />
+        );
+      })}
+    </List.Accordion>
   );
 };
 
@@ -96,8 +69,53 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   return <Text>{dayjs.duration(target).format("HH[h] mm[m] ss[s]")}</Text>;
 };
 
+function TimersList({ contacts }) {
+  const durations: Set<number> = new Set();
+  contacts.forEach((c) => c.messages.forEach((m) => durations.add(m.duration)));
+  const durationMessages = Array.from(durations).map((d) => {
+    const dateMessages: any[] = [];
+    contacts.forEach((c) => {
+      c.messages.forEach((m) => {
+        if (m.duration === d) {
+          dateMessages.push({
+            content: m.content,
+            recipient: c.name,
+            emailEnabled: c.emailEnabled,
+            smsEnabled: c.smsEnabled
+        });
+        }
+      });
+    });
+    return {
+      duration: d,
+      messages: dateMessages,
+    };
+  });
+
+  console.log(durationMessages);
+
+  return (
+    <ScrollView>
+      <List.Section title="Timers">
+        {durationMessages.map((dm) => (
+          <AccordionList
+            messages={dm.messages}
+            targetDate={dayjs().add(dayjs.duration(dm.duration))}
+          />
+        ))}
+      </List.Section>
+    </ScrollView>
+  );
+}
+
 export function Timers() {
   return (
-    <AccordionList targetDate={twelve} messages={messages}></AccordionList>
+    <ContactContext.Consumer>
+      {(contacts) => (
+        <View>
+          <TimersList contacts={contacts} />
+        </View>
+      )}
+    </ContactContext.Consumer>
   );
 }

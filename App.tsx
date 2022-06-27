@@ -21,6 +21,45 @@ ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   }
 });
 
+const contacts = [
+  {
+    name: "Test Name",
+    phoneNumber: "05120519512",
+    email: "test@test.com",
+    emailEnabled: true,
+    smsEnabled: false,
+    messages: [
+      {
+        content: "Test content",
+        duration: 15202518,
+      },
+      {
+        content: "Test content 2",
+        duration: 16202519,
+      },
+    ],
+  },
+  {
+    name: "Test Name 2",
+    phoneNumber: "05120519512",
+    email: "test@test.com",
+    emailEnabled: true,
+    smsEnabled: true,
+    messages: [
+      {
+        content: "Test content 3",
+        duration: 15202518,
+      },
+      {
+        content: "Test content 4",
+        duration: 15292529,
+      },
+    ],
+  },
+];
+
+export const ContactContext = React.createContext(contacts);
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -124,24 +163,26 @@ const linking = {
 
 export default function App() {
   return (
-    <Provider theme={DefaultTheme}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="TestScreen" component={TestScreen} />
-          <Stack.Screen
-            name="ContactEdit"
-            options={({ route }) => ({ title: route.params.data.name })}
-            component={ContactEdit}
-          />
-        </Stack.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </Provider>
+    <ContactContext.Provider value={contacts}>
+      <Provider theme={DefaultTheme}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="TestScreen" component={TestScreen} />
+            <Stack.Screen
+              name="ContactEdit"
+              options={({ route }) => ({ title: route.params.data.name })}
+              component={ContactEdit}
+            />
+          </Stack.Navigator>
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </Provider>
+    </ContactContext.Provider>
   );
 }
 
