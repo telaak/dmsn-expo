@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { LayoutAnimation, ScrollView, UIManager, View } from "react-native";
-import { Button, List } from "react-native-paper";
-import { MaterialIcons } from "@expo/vector-icons";
+import {
+  LayoutAnimation,
+  ScrollView,
+  UIManager,
+  View,
+  StyleSheet,
+} from "react-native";
+import { Button, FAB, List } from "react-native-paper";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text } from "react-native-paper";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
-import { ContactContext } from "../App";
+import { ContactContext, IContact, IMessage, ITimerMessage } from "../App";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-function formatDuration(period) {
+function formatDuration(period: string) {
   let parts = [];
   const duration = dayjs.duration(period);
 
@@ -67,15 +73,17 @@ const AccordionList = ({
 
   return (
     <List.Accordion
-      title={<CountdownTimer targetDate={targetDate} />}
-      description={
-        <Text>{formatDuration(dayjs.duration(duration).toISOString())}</Text>
+      description={<CountdownTimer targetDate={targetDate} />}
+      title={
+        <Text style={{ fontWeight: "bold" }}>
+          {formatDuration(dayjs.duration(duration).toISOString())}
+        </Text>
       }
       left={(props) => <List.Icon {...props} icon="clock" />}
       expanded={expanded}
       onPress={handlePress}
     >
-      {messages.map((m, i) => {
+      {messages.map((m: ITimerMessage, i: number) => {
         return (
           <List.Item
             right={(props) => (
@@ -128,12 +136,15 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   return <Text>{formatDuration(dayjs.duration(target).toISOString())}</Text>;
 };
 
-function TimersList({ contacts }) {
+const TimersList = ({ contacts }: { contacts: IContact[] }) => {
+  const typedContacts: IContact[] = contacts;
   const durations: Set<number> = new Set();
-  contacts.forEach((c) => c.messages.forEach((m) => durations.add(m.duration)));
+  contacts.forEach((c: IContact) =>
+    c.messages.forEach((m) => durations.add(m.duration))
+  );
   const durationMessages = Array.from(durations).map((d) => {
     const dateMessages: any[] = [];
-    contacts.forEach((c) => {
+    contacts.forEach((c: IContact) => {
       c.messages.forEach((m) => {
         if (m.duration === d) {
           dateMessages.push({
@@ -152,29 +163,43 @@ function TimersList({ contacts }) {
   });
 
   return (
-    <ScrollView>
-      <List.Section title="Timers">
-        {durationMessages.map((dm, i) => (
-          <AccordionList
-            key={i}
-            messages={dm.messages}
-            targetDate={dayjs().add(dayjs.duration(dm.duration))}
-            duration={dm.duration}
-          />
-        ))}
-      </List.Section>
-    </ScrollView>
+    <List.Section title="Timers">
+      {durationMessages.map((dm, i) => (
+        <AccordionList
+          key={i}
+          messages={dm.messages}
+          targetDate={dayjs().add(dayjs.duration(dm.duration))}
+          duration={dm.duration}
+        />
+      ))}
+    </List.Section>
   );
-}
+};
 
 export function Timers() {
   return (
     <ContactContext.Consumer>
       {(contacts) => (
-        <View>
-          <TimersList contacts={contacts} />
+        <View style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <TimersList contacts={contacts} />
+          </ScrollView>
+          <FAB
+            icon={() => <MaterialCommunityIcons name="access-point-network" size={24} />}
+            style={styles.fab}
+            onPress={() => console.log("Pressed")}
+          />
         </View>
       )}
     </ContactContext.Consumer>
   );
 }
+
+const styles = StyleSheet.create({
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+});

@@ -13,7 +13,7 @@ import { ContactList } from "./screens/ContactList";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { ContactEdit } from "./screens/ContactEdit";
 import { Timers } from "./screens/Timers";
-import { Provider, DefaultTheme } from "react-native-paper";
+import { Provider, DefaultTheme, DarkTheme } from "react-native-paper";
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   if (!orientation.screenOrientationLockWeb) {
@@ -58,6 +58,26 @@ const contacts = [
   },
 ];
 
+export interface IContact {
+  name: string
+  phoneNumber: string
+  email: string
+  emailEnabled: boolean
+  smsEnabled: boolean
+  messages: IMessage[]
+}
+
+export interface ITimerMessage extends IMessage {
+  recipient: string
+  smsEnabled: boolean
+  emailEnabled: boolean
+}
+
+export interface IMessage {
+  content: string
+  duration: number
+}
+
 export const ContactContext = React.createContext(contacts);
 
 const Tab = createBottomTabNavigator();
@@ -66,9 +86,7 @@ const TopTab = createMaterialTopTabNavigator();
 
 function Feed() {
   return (
-    <View>
       <Timers></Timers>
-    </View>
   );
 }
 
@@ -97,7 +115,7 @@ function Profile2() {
   );
 }
 
-function Settings({ navigation }) {
+function Settings({ navigation }: { navigation: any }) {
   return (
     <View>
       <Button
@@ -153,10 +171,11 @@ const TestScreen = () => {
 };
 
 const linking = {
+  enabled: true,
   prefixes: [],
   config: {
     screens: {
-      Home: "/Home",
+      
     },
   },
 };
@@ -165,7 +184,7 @@ export default function App() {
   return (
     <ContactContext.Provider value={contacts}>
       <Provider theme={DefaultTheme}>
-        <NavigationContainer>
+        <NavigationContainer linking={{enabled: true, prefixes: []}} >
           <Stack.Navigator>
             <Stack.Screen
               name="Home"
@@ -175,7 +194,7 @@ export default function App() {
             <Stack.Screen name="TestScreen" component={TestScreen} />
             <Stack.Screen
               name="ContactEdit"
-              options={({ route }) => ({ title: route.params.data.name })}
+        /*      options={({ route }) => ({ title: route.params?.data.name })} */
               component={ContactEdit}
             />
           </Stack.Navigator>

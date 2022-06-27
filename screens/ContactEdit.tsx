@@ -2,8 +2,9 @@ import React from "react";
 import { View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
 import { TextInput } from "react-native-paper";
 import { List } from "react-native-paper";
-import * as ScreenOrientation from "expo-screen-orientation";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+
 
 export interface IContact {
   name: string;
@@ -33,8 +34,15 @@ const TextInputComponent = (props) => {
 };
 
 export function ContactEdit({ route, navigation }) {
-  const { data }: { data: IContact } = route.params;
+  const data = JSON.parse(route.params.data)
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <MaterialIcons size={24} name="save"/>
+      ),
+    });
+  }, [navigation]);
   return (
     <KeyboardAwareScrollView>
       <ScrollView>

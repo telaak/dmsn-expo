@@ -93,7 +93,7 @@ export function ContactList({ navigation }) {
     setPage(0);
   }, [numberOfItemsPerPage]);
 
-  const getIcon = (isSorted) => {
+  const getIcon = (isSorted: boolean) => {
     if (typeof isSorted === "undefined") {
       return "";
     } else if (isSorted) {
@@ -117,7 +117,7 @@ export function ContactList({ navigation }) {
         <Divider />
         <Menu.Item onPress={() => {}} title="Item 3" />
       </Menu>
-      <DataTable {...getTableProps()}>
+      <DataTable>
         {headerGroups.map((headerGroup) => (
           <DataTable.Header {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
@@ -170,7 +170,7 @@ const RowView = ({ navigation, row }) => {
           <Menu.Item
             icon={() => <MaterialIcons name="edit" size={24} />}
             onPress={() => {
-              navigation.navigate("ContactEdit", { data: row.original });
+              navigation.navigate("ContactEdit", { data: JSON.stringify(row.original) });
               closeMenu();
             }}
             title="Edit"
