@@ -31,11 +31,11 @@ const contacts = [
     messages: [
       {
         content: "Test content",
-        duration: 15202518,
+        duration: 1000 * 60 * 60 * 24,
       },
       {
         content: "Test content 2",
-        duration: 16202519,
+        duration: 1000 * 60 * 60 * 24 * 2,
       },
     ],
   },
@@ -48,11 +48,11 @@ const contacts = [
     messages: [
       {
         content: "Test content 3",
-        duration: 15202518,
+        duration: 1000 * 60 * 60 * 24,
       },
       {
         content: "Test content 4",
-        duration: 15292529,
+        duration: 1000 * 60 * 60 * 24 * 7 * 6,
       },
     ],
   },

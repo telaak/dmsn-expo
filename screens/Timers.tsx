@@ -10,12 +10,54 @@ import { ContactContext } from "../App";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
+function formatDuration(period) {
+  let parts = [];
+  const duration = dayjs.duration(period);
+
+  // return nothing when the duration is falsy or not correctly parsed (P0D)
+  if (!duration || duration.toISOString() === "P0D") return;
+
+  if (duration.years() >= 1) {
+    const years = Math.floor(duration.years());
+    parts.push(years + " " + (years > 1 ? "years" : "year"));
+  }
+
+  if (duration.months() >= 1) {
+    const months = Math.floor(duration.months());
+    parts.push(months + " " + (months > 1 ? "months" : "month"));
+  }
+
+  if (duration.days() >= 1) {
+    const days = Math.floor(duration.days());
+    parts.push(days + " " + (days > 1 ? "days" : "day"));
+  }
+
+  if (duration.hours() >= 1) {
+    const hours = Math.floor(duration.hours());
+    parts.push(hours + " " + (hours > 1 ? "hours" : "hour"));
+  }
+
+  if (duration.minutes() >= 1) {
+    const minutes = Math.floor(duration.minutes());
+    parts.push(minutes + " " + (minutes > 1 ? "minutes" : "minute"));
+  }
+
+  if (duration.seconds() >= 1) {
+    const seconds = Math.floor(duration.seconds());
+    parts.push(seconds + " " + (seconds > 1 ? "seconds" : "second"));
+  }
+
+  return parts.join(", ");
+}
+
 const AccordionList = ({
   targetDate,
   messages,
+  duration,
 }: {
   targetDate: dayjs.Dayjs;
   messages: any;
+  duration: number;
 }) => {
   const [expanded, setExpanded] = React.useState(false);
   const handlePress = () => {
@@ -26,6 +68,9 @@ const AccordionList = ({
   return (
     <List.Accordion
       title={<CountdownTimer targetDate={targetDate} />}
+      description={
+        <Text>{formatDuration(dayjs.duration(duration).toISOString())}</Text>
+      }
       left={(props) => <List.Icon {...props} icon="clock" />}
       expanded={expanded}
       onPress={handlePress}
@@ -80,7 +125,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
     return () => clearInterval(interval);
   }, []);
 
-  return <Text>{dayjs.duration(target).format("HH[h] mm[m] ss[s]")}</Text>;
+  return <Text>{formatDuration(dayjs.duration(target).toISOString())}</Text>;
 };
 
 function TimersList({ contacts }) {
@@ -114,6 +159,7 @@ function TimersList({ contacts }) {
             key={i}
             messages={dm.messages}
             targetDate={dayjs().add(dayjs.duration(dm.duration))}
+            duration={dm.duration}
           />
         ))}
       </List.Section>
