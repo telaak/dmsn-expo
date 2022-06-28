@@ -23,7 +23,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = React.useReducer(
-        (prevState, action) => {
+        (prevState: any, action: { type: any; token?: any; }) => {
           switch (action.type) {
             case 'RESTORE_TOKEN':
               return {
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
           try {
             userToken = await SecureStore.getItemAsync('token');
           } catch (e) {
-            // Restoring token failed
+            // console.log(e)
           }
     
           // After restoring token, we may need to validate it in production apps
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     
       const authContext = React.useMemo(
         () => ({
-          signIn: async (data) => {
+          signIn: async (data: any) => {
             // In a production app, we need to send some data (usually username, password) to server and get a token
             // We will also need to handle errors if sign in failed
             // After getting token, we need to persist the token using `SecureStore`
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
             dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
           },
           signOut: () => dispatch({ type: 'SIGN_OUT' }),
-          signUp: async (data) => {
+          signUp: async (data: any) => {
             // In a production app, we need to send user data to server and get a token
             // We will also need to handle errors if sign up failed
             // After getting token, we need to persist the token using `SecureStore`

@@ -35,13 +35,14 @@ const TextInputComponent = (props) => {
 
 export function ContactEdit({ route, navigation }) {
   const data: IContact = JSON.parse(route.params.data)
-  navigation.setOptions({ title: data.name })
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <MaterialIcons size={24} name="save"/>
       ),
-    });
+      title: data.name
+    },
+    );
   }, [navigation]);
   return (
     <KeyboardAwareScrollView>
