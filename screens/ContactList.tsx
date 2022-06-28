@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Pressable,
+  StyleSheet,
 } from "react-native";
-import { DataTable, TouchableRipple } from "react-native-paper";
+import { DataTable, FAB, TouchableRipple } from "react-native-paper";
 import { useSortBy, useTable } from "react-table";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { Button, Menu, Divider, Provider } from "react-native-paper";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const numberOfItemsPerPageList = [1, 2, 3, 4];
 
@@ -103,44 +104,39 @@ export function ContactList({ navigation }) {
     }
   };
 
-  const [visible, setVisible] = React.useState(false);
-
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-
   return (
-    <ScrollView>
-      <Menu visible={visible} onDismiss={closeMenu} anchor={<></>}>
-        <Menu.Item onPress={() => {}} title="Item 1" />
-        <Menu.Item onPress={() => {}} title="Item 2" />
-        <Divider />
-        <Menu.Item onPress={() => {}} title="Item 3" />
-      </Menu>
-      <DataTable>
-        {headerGroups.map((headerGroup) => (
-          <DataTable.Header {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <DataTable.Title
-                {...column.getHeaderProps(column.getSortByToggleProps())}
-                onPress={() => column.toggleSortBy()}
-              >
-                {column.render("Header")}
-                <MaterialIcons
-                  name={getIcon(column.isSortedDesc)}
-                  size={16}
-                  color="black"
-                />
-              </DataTable.Title>
-            ))}
-          </DataTable.Header>
-        ))}
-        {rows.map((row, i) => {
-          prepareRow(row);
-          return <RowView navigation={navigation} row={row} key={i} />;
-        })}
-      </DataTable>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <DataTable>
+          {headerGroups.map((headerGroup) => (
+            <DataTable.Header {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <DataTable.Title
+                  {...column.getHeaderProps(column.getSortByToggleProps())}
+                  onPress={() => column.toggleSortBy()}
+                >
+                  {column.render("Header")}
+                  <MaterialIcons
+                    name={getIcon(column.isSortedDesc)}
+                    size={16}
+                    color="black"
+                  />
+                </DataTable.Title>
+              ))}
+            </DataTable.Header>
+          ))}
+          {rows.map((row, i) => {
+            prepareRow(row);
+            return <RowView navigation={navigation} row={row} key={i} />;
+          })}
+        </DataTable>
+      </ScrollView>
+      <FAB
+        icon={() => <MaterialCommunityIcons name="plus" size={24} />}
+        style={styles.fab}
+        onPress={() => console.log("Pressed")}
+      />
+    </View>
   );
 }
 
@@ -170,7 +166,9 @@ const RowView = ({ navigation, row }) => {
           <Menu.Item
             icon={() => <MaterialIcons name="edit" size={24} />}
             onPress={() => {
-              navigation.navigate("ContactEdit", { data: JSON.stringify(row.original) });
+              navigation.navigate("ContactEdit", {
+                data: JSON.stringify(row.original),
+              });
               closeMenu();
             }}
             title="Edit"
@@ -178,8 +176,8 @@ const RowView = ({ navigation, row }) => {
           <Menu.Item
             icon={() => <MaterialIcons name="content-copy" size={24} />}
             onPress={() => {
-                copyToClipboard(JSON.stringify(row.original))
-                closeMenu()
+              copyToClipboard(JSON.stringify(row.original));
+              closeMenu();
             }}
             title="Copy"
           />
@@ -204,4 +202,11 @@ const RowView = ({ navigation, row }) => {
   );
 };
 
-
+const styles = StyleSheet.create({
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+});

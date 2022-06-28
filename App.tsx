@@ -1,8 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -13,7 +13,14 @@ import { ContactList } from "./screens/ContactList";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { ContactEdit } from "./screens/ContactEdit";
 import { Timers } from "./screens/Timers";
-import { Provider, DefaultTheme, DarkTheme } from "react-native-paper";
+import {
+  Provider,
+  DefaultTheme,
+  DarkTheme,
+  TextInput,
+  Button,
+} from "react-native-paper";
+import { Login } from "./screens/Login";
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   if (!orientation.screenOrientationLockWeb) {
@@ -59,23 +66,23 @@ const contacts = [
 ];
 
 export interface IContact {
-  name: string
-  phoneNumber: string
-  email: string
-  emailEnabled: boolean
-  smsEnabled: boolean
-  messages: IMessage[]
+  name: string;
+  phoneNumber: string;
+  email: string;
+  emailEnabled: boolean;
+  smsEnabled: boolean;
+  messages: IMessage[];
 }
 
 export interface ITimerMessage extends IMessage {
-  recipient: string
-  smsEnabled: boolean
-  emailEnabled: boolean
+  recipient: string;
+  smsEnabled: boolean;
+  emailEnabled: boolean;
 }
 
 export interface IMessage {
-  content: string
-  duration: number
+  content: string;
+  duration: number;
 }
 
 export const ContactContext = React.createContext(contacts);
@@ -85,9 +92,7 @@ const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
 function Feed() {
-  return (
-      <Timers></Timers>
-  );
+  return <Timers></Timers>;
 }
 
 function Messages() {
@@ -103,14 +108,6 @@ function Profile() {
   return (
     <View>
       <Text>Test3</Text>
-    </View>
-  );
-}
-
-function Profile2() {
-  return (
-    <View>
-      <Text>Test</Text>
     </View>
   );
 }
@@ -174,9 +171,7 @@ const linking = {
   enabled: true,
   prefixes: [],
   config: {
-    screens: {
-      
-    },
+    screens: {},
   },
 };
 
@@ -184,8 +179,9 @@ export default function App() {
   return (
     <ContactContext.Provider value={contacts}>
       <Provider theme={DefaultTheme}>
-        <NavigationContainer linking={{enabled: true, prefixes: []}} >
+        <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
           <Stack.Navigator>
+            <Stack.Screen name="Login" component={Login} />
             <Stack.Screen
               name="Home"
               component={Home}
@@ -194,7 +190,7 @@ export default function App() {
             <Stack.Screen name="TestScreen" component={TestScreen} />
             <Stack.Screen
               name="ContactEdit"
-        /*      options={({ route }) => ({ title: route.params?.data.name })} */
+              /*      options={({ route }) => ({ title: route.params?.data.name })} */
               component={ContactEdit}
             />
           </Stack.Navigator>
@@ -204,12 +200,3 @@ export default function App() {
     </ContactContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
