@@ -34,8 +34,8 @@ const TextInputComponent = (props) => {
 };
 
 export function ContactEdit({ route, navigation }) {
-  const data = JSON.parse(route.params.data)
-
+  const data: IContact = JSON.parse(route.params.data)
+  navigation.setOptions({ title: data.name })
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (

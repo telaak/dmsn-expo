@@ -20,7 +20,7 @@ import {
   TextInput,
   Button,
 } from "react-native-paper";
-import { Login } from "./screens/Login";
+import { AuthContext, AuthProvider, Login } from "./screens/Login";
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   if (!orientation.screenOrientationLockWeb) {
@@ -178,25 +178,36 @@ const linking = {
 export default function App() {
   return (
     <ContactContext.Provider value={contacts}>
-      <Provider theme={DefaultTheme}>
-        <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
-          <Stack.Navigator>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen
-              name="Home"
-              component={Home}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="TestScreen" component={TestScreen} />
-            <Stack.Screen
-              name="ContactEdit"
-              /*      options={({ route }) => ({ title: route.params?.data.name })} */
-              component={ContactEdit}
-            />
-          </Stack.Navigator>
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </Provider>
+      <AuthProvider>
+        <Provider theme={DefaultTheme}>
+          <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
+            <AuthGuard></AuthGuard>
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </Provider>
+      </AuthProvider>
     </ContactContext.Provider>
+  );
+}
+
+function AuthGuard() {
+  const { state } = React.useContext(AuthContext);
+
+  return (
+    <Stack.Navigator>
+      {state.userToken == null ? (
+        <Stack.Screen name="Login" component={Login} />
+      ) : (
+        <Stack.Group>
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="TestScreen" component={TestScreen} />
+          <Stack.Screen name="ContactEdit" component={ContactEdit} />
+        </Stack.Group>
+      )}
+    </Stack.Navigator>
   );
 }
