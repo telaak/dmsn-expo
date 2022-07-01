@@ -21,6 +21,8 @@ import {
   Button,
 } from "react-native-paper";
 import { AuthContext, AuthProvider, Login } from "./screens/Login";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
   if (!orientation.screenOrientationLockWeb) {
@@ -177,16 +179,18 @@ const linking = {
 
 export default function App() {
   return (
-    <ContactContext.Provider value={contacts}>
-      <AuthProvider>
-        <Provider theme={DefaultTheme}>
-          <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
-            <AuthGuard></AuthGuard>
-            <StatusBar style="auto" />
-          </NavigationContainer>
-        </Provider>
-      </AuthProvider>
-    </ContactContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <ContactContext.Provider value={contacts}>
+        <AuthProvider>
+          <Provider theme={DefaultTheme}>
+            <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
+              <AuthGuard></AuthGuard>
+              <StatusBar style="auto" />
+            </NavigationContainer>
+          </Provider>
+        </AuthProvider>
+      </ContactContext.Provider>
+    </QueryClientProvider>
   );
 }
 
