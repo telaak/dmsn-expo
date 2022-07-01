@@ -13,6 +13,9 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import { ContactContext, IContact, IMessage, ITimerMessage } from "../App";
+import { useQuery, useQueryClient } from "react-query";
+import axios from "axios";
+import { getUser } from "../api/api";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
@@ -137,7 +140,6 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
 };
 
 const TimersList = ({ contacts }: { contacts: IContact[] }) => {
-  const typedContacts: IContact[] = contacts;
   const durations: Set<number> = new Set();
   contacts.forEach((c: IContact) =>
     c.messages.forEach((m) => durations.add(m.duration))
@@ -177,6 +179,8 @@ const TimersList = ({ contacts }: { contacts: IContact[] }) => {
 };
 
 export function Timers() {
+  const queryClient = useQueryClient();
+  const { status, data, error, isSuccess } = useQuery("user", getUser)
   return (
     <ContactContext.Consumer>
       {(contacts) => (

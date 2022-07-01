@@ -21,7 +21,9 @@ import {
   Button,
 } from "react-native-paper";
 import { AuthContext, AuthProvider, Login } from "./screens/Login";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
+import axios from "axios";
+import { getUser } from "./api/api";
 export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
@@ -181,25 +183,23 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ContactContext.Provider value={contacts}>
-        <AuthProvider>
           <Provider theme={DefaultTheme}>
             <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
               <AuthGuard></AuthGuard>
               <StatusBar style="auto" />
             </NavigationContainer>
           </Provider>
-        </AuthProvider>
       </ContactContext.Provider>
     </QueryClientProvider>
   );
 }
 
 function AuthGuard() {
-  const { state } = React.useContext(AuthContext);
-
+  const queryClient = useQueryClient();
+  const { status, data, error, isSuccess } = useQuery("user", getUser)
   return (
     <Stack.Navigator>
-      {state.userToken == null ? (
+      {!isSuccess ? (
         <Stack.Screen name="Login" component={Login} />
       ) : (
         <Stack.Group>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -15,11 +15,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { Button, Menu, Divider, Provider } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import axios from "axios";
+import { useQueryClient, useQuery } from "react-query";
+import { getUser } from "../api/api";
+import { IContact } from "./ContactEdit";
 
 const numberOfItemsPerPageList = [1, 2, 3, 4];
 
 export function ContactList({ navigation }) {
-  const data = React.useMemo(
+  const [testData, setTestData] = React.useState<IContact[] | never[]>([] as IContact[])
+  const test = React.useMemo(
     () => [
       {
         name: "Test name A",
@@ -80,19 +85,21 @@ export function ContactList({ navigation }) {
     []
   );
 
+  const queryClient = useQueryClient();
+  const { status, data, error, isSuccess } = useQuery("user", getUser)
+
+  const getContacts = useEffect(() => {
+    if (status === 'success') {
+      const contacts = data.contacts
+      setTestData(contacts)
+    }
+  }, [status, data]);
+
+  
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data }, useSortBy);
+    useTable({ columns: columns, data: testData }, useSortBy);
 
-  const [page, setPage] = React.useState(0);
-  const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(
-    numberOfItemsPerPageList[0]
-  );
-  const from = page * numberOfItemsPerPage;
-  const to = Math.min((page + 1) * numberOfItemsPerPage, data.length);
-
-  React.useEffect(() => {
-    setPage(0);
-  }, [numberOfItemsPerPage]);
 
   const getIcon = (isSorted: boolean) => {
     if (typeof isSorted === "undefined") {
@@ -190,7 +197,7 @@ const RowView = ({ navigation, row }) => {
         </Menu>
       </View>
       <DataTable.Row {...row.getRowProps()}>
-        {row.cells.map((cell, i) => {
+        {row.cells.map((cell, i: number) => {
           return (
             <DataTable.Cell key={i} {...cell.getCellProps()}>
               <Text>{cell.value}</Text>

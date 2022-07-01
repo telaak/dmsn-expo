@@ -11,14 +11,14 @@ const styles = StyleSheet.create({
 import axios from "axios";
 import * as LocalAuthentication from "expo-local-authentication";
 
-//SecureStore.setItemAsync("username", "teemu");
-//SecureStore.setItemAsync("password", "seppo");
+//SecureStore.setItemAsync("username", "Test");
+//SecureStore.setItemAsync("password", "Kys");
 
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useEffect, useReducer, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { Button, TextInput } from "react-native-paper";
-import { useMutation } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 export const AuthContext = createContext();
 
@@ -104,21 +104,25 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export function Login() {
+export function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { authContext } = React.useContext(AuthContext);
+  const queryClient = useQueryClient();
 
-  const mutation = useMutation((loginDetails) => {
-    return axios.post("http://localhost:3000/api/user/login", loginDetails);
-  }, {
+  const mutation = useMutation(
+    (loginDetails) => {
+      return axios.post('http://192.168.0.64:3000/api/user/login', loginDetails, { withCredentials: true })
+    },
+    {
       onSuccess: (data: any) => {
           console.log(data)
-      }
-  });
+          queryClient.setQueryData(['user'], data)
+         // authContext.signIn({ username, password });
+      },
+    }
+  );
 
-  
 
   const getCredentials = async () => {
     const [username, password] = await Promise.all([
@@ -133,16 +137,17 @@ export function Login() {
     // authContext.signIn({ username, password });
   };
 
-  useEffect(() => {
+  const fingerPrintLogin = useEffect(() => {
     SecureStore.isAvailableAsync().then(async (isAvailable) => {
       if (isAvailable) {
         const result = await LocalAuthentication.authenticateAsync();
         if (result.success) {
-          loginFn();
+          const [username, password] = await getCredentials();
+          await mutation.mutateAsync({ username, password });
         }
       }
     });
-  });
+  }, []);
 
   return (
     <View style={styles.container}>
