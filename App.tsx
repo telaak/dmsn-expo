@@ -20,7 +20,7 @@ import {
   TextInput,
   Button,
 } from "react-native-paper";
-import { AuthContext, AuthProvider, Login } from "./screens/Login";
+import { Login } from "./screens/Login";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import axios from "axios";
 import { getUser } from "./api/api";
@@ -31,65 +31,6 @@ ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
     ScreenOrientation.unlockAsync();
   }
 });
-
-const contacts = [
-  {
-    name: "Test Name",
-    phoneNumber: "05120519512",
-    email: "test@test.com",
-    emailEnabled: true,
-    smsEnabled: false,
-    messages: [
-      {
-        content: "Test content",
-        duration: 1000 * 60 * 60 * 24,
-      },
-      {
-        content: "Test content 2",
-        duration: 1000 * 60 * 60 * 24 * 2,
-      },
-    ],
-  },
-  {
-    name: "Test Name 2",
-    phoneNumber: "05120519512",
-    email: "test@test.com",
-    emailEnabled: true,
-    smsEnabled: true,
-    messages: [
-      {
-        content: "Test content 3",
-        duration: 1000 * 60 * 60 * 24,
-      },
-      {
-        content: "Test content 4",
-        duration: 1000 * 60 * 60 * 24 * 7 * 6,
-      },
-    ],
-  },
-];
-
-export interface IContact {
-  name: string;
-  phoneNumber: string;
-  email: string;
-  emailEnabled: boolean;
-  smsEnabled: boolean;
-  messages: IMessage[];
-}
-
-export interface ITimerMessage extends IMessage {
-  recipient: string;
-  smsEnabled: boolean;
-  emailEnabled: boolean;
-}
-
-export interface IMessage {
-  content: string;
-  duration: number;
-}
-
-export const ContactContext = React.createContext(contacts);
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -182,14 +123,12 @@ const linking = {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ContactContext.Provider value={contacts}>
           <Provider theme={DefaultTheme}>
             <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
               <AuthGuard></AuthGuard>
               <StatusBar style="auto" />
             </NavigationContainer>
           </Provider>
-      </ContactContext.Provider>
     </QueryClientProvider>
   );
 }

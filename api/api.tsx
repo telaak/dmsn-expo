@@ -1,4 +1,6 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
+import { useMutation } from "react-query";
+import { queryClient } from "../App";
 
 export interface IMessage {
   duration: number;
@@ -28,9 +30,51 @@ export interface IUser {
   _id?: string;
 }
 
+const apiUrl = `http://192.168.0.64:3000`;
+
+const axiosOptions: AxiosRequestConfig = {
+  withCredentials: true,
+};
+
 export const getUser = async (): Promise<IUser> => {
-  const res = await axios.get("http://192.168.0.64:3000/api/user/current", {
+  const res = await axios.get(`${apiUrl}/api/user/current`, axiosOptions);
+  return res.data;
+};
+
+export const pingServer = async (): Promise<Date> => {
+  const res = await axios.get(`${apiUrl}/api/user/ping`, {
     withCredentials: true,
   });
+  return res.data;
+};
+
+export const login = async (loginDetails: {
+  username: string;
+  password: string;
+}): Promise<IUser> => {
+  return axios.post(`${apiUrl}/api/user/login`, loginDetails, {
+    withCredentials: true,
+  });
+};
+
+export const setUserData = (data: IUser) => {
+  queryClient.setQueryData(["user"], data);
+};
+
+export const createContact = async (newContact: IContact) => {
+  const res = await axios.post(`${apiUrl}/api/user/contact`, newContact, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+export const updateContact = async (partialContact: Partial<IContact>) => {
+  const res = await axios.patch(
+    `${apiUrl}/api/user/contact/${partialContact._id}`,
+    partialContact,
+    {
+      withCredentials: true,
+    }
+  );
   return res.data;
 };

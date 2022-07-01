@@ -24,47 +24,6 @@ const numberOfItemsPerPageList = [1, 2, 3, 4];
 
 export function ContactList({ navigation }) {
   const [testData, setTestData] = React.useState<IContact[] | never[]>([] as IContact[])
-  const test = React.useMemo(
-    () => [
-      {
-        name: "Test name A",
-        email: "test@test.fi",
-        phoneNumber: "0449708811",
-        _id: "152521521",
-        messages: [
-          {
-            time: "3d",
-            content: "Goodbye cruel world",
-          },
-          {
-            time: "9d",
-            content: "I lied",
-          },
-          {
-            time: "12d",
-            content: "Or not",
-          },
-        ],
-      },
-      {
-        name: "Test name B",
-        email: "test@test.fi",
-        phoneNumber: "0595958",
-        _id: "53t5239ufas",
-        messages: [
-          {
-            time: "3d",
-            content: "Goodbye cruel world",
-          },
-          {
-            time: "9d",
-            content: "I lied",
-          },
-        ],
-      },
-    ],
-    []
-  );
 
   const columns = React.useMemo(
     () => [
@@ -85,7 +44,6 @@ export function ContactList({ navigation }) {
     []
   );
 
-  const queryClient = useQueryClient();
   const { status, data, error, isSuccess } = useQuery("user", getUser)
 
   const getContacts = useEffect(() => {

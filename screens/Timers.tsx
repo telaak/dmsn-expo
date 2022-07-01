@@ -5,19 +5,26 @@ import {
   UIManager,
   View,
   StyleSheet,
+  Text,
 } from "react-native";
 import { Button, FAB, List } from "react-native-paper";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text } from "react-native-paper";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
-import { ContactContext, IContact, IMessage, ITimerMessage } from "../App";
-import { useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import axios from "axios";
-import { getUser } from "../api/api";
+import { getUser, IContact, IMessage, pingServer } from "../api/api";
+import _ from 'lodash';
+
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
+
+export interface ITimerMessage extends IMessage {
+  recipient: string;
+  smsEnabled: boolean;
+  emailEnabled: boolean;
+}
 
 function formatDuration(period: string) {
   let parts = [];
@@ -57,6 +64,14 @@ function formatDuration(period: string) {
   }
 
   return parts.join(", ");
+}
+
+export interface IDurationMessage {
+  content: string;
+  recipient: string;
+  emailEnabled: boolean;
+  smsEnabled: boolean;
+  duration: number
 }
 
 const AccordionList = ({
@@ -128,7 +143,7 @@ const AccordionList = ({
 const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   const [target, setTarget] = React.useState(targetDate.diff(dayjs()));
 
-  useEffect(() => {
+  const timer = useEffect(() => {
     const interval = setInterval(() => {
       setTarget(targetDate.diff(dayjs()));
     }, 1000);
@@ -139,63 +154,86 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   return <Text>{formatDuration(dayjs.duration(target).toISOString())}</Text>;
 };
 
-const TimersList = ({ contacts }: { contacts: IContact[] }) => {
+export const mapDurationMessages = (contacts: IContact[]) => {
   const durations: Set<number> = new Set();
-  contacts.forEach((c: IContact) =>
-    c.messages.forEach((m) => durations.add(m.duration))
-  );
-  const durationMessages = Array.from(durations).map((d) => {
+  for (const contact of contacts) {
+    contact.messages.forEach((m) => durations.add(m.duration))
+  }
+  const mappedDurationMessages = Array.from(durations).map((d) => {
     const dateMessages: any[] = [];
-    contacts.forEach((c: IContact) => {
-      c.messages.forEach((m) => {
-        if (m.duration === d) {
+    for (const contact of contacts) {
+      for (const message of contact.messages) {
+        if (message.duration === d) {
           dateMessages.push({
-            content: m.content,
-            recipient: c.name,
-            emailEnabled: c.emailEnabled,
-            smsEnabled: c.smsEnabled,
+            content: message.content,
+            recipient: contact.name,
+            emailEnabled: contact.emailEnabled,
+            smsEnabled: contact.smsEnabled,
           });
         }
-      });
-    });
+      }
+    }
+
     return {
       duration: d,
       messages: dateMessages,
     };
   });
+  return mappedDurationMessages
+}
+
+const TimersList = () => {
+  const { status, data, error, isSuccess } = useQuery("user", getUser);
+
+  const [lastPing, setLastPing] = useState<Date>(new Date());
+  const [durationMessages, setDurationMessages] = useState<IDurationMessage[]>([]);
+
+  const getContacts = useEffect(() => {
+    if (status === "success") {
+      const contacts: IContact[] = data.contacts
+      setLastPing(data.lastPing);
+      setDurationMessages(mapDurationMessages(contacts))
+    }
+  }, [status, data, lastPing]);
 
   return (
+    lastPing ? 
     <List.Section title="Timers">
+      <List.Item title={() => <Text>{lastPing ? dayjs(lastPing).format() : ''}</Text>} />
       {durationMessages.map((dm, i) => (
         <AccordionList
-          key={i}
+          key={dayjs(lastPing).valueOf() + i}
           messages={dm.messages}
-          targetDate={dayjs().add(dayjs.duration(dm.duration))}
+          targetDate={dayjs(lastPing).add(dayjs.duration(dm.duration))}
           duration={dm.duration}
         />
       ))}
-    </List.Section>
+    </List.Section> : <View></View>
   );
 };
 
 export function Timers() {
-  const queryClient = useQueryClient();
-  const { status, data, error, isSuccess } = useQuery("user", getUser)
+  const queryClient = useQueryClient()
+  const pingMutation = useMutation(pingServer, {
+    onSuccess: (newTimestamp: Date) => {
+      console.log(newTimestamp)
+      queryClient.invalidateQueries('user')
+    },
+  })
+
   return (
-    <ContactContext.Consumer>
-      {(contacts) => (
-        <View style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <TimersList contacts={contacts} />
-          </ScrollView>
-          <FAB
-            icon={() => <MaterialCommunityIcons name="access-point-network" size={24} />}
-            style={styles.fab}
-            onPress={() => console.log("Pressed")}
-          />
-        </View>
-      )}
-    </ContactContext.Consumer>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <TimersList />
+      </ScrollView>
+      <FAB
+        icon={() => (
+          <MaterialCommunityIcons name="access-point-network" size={24} />
+        )}
+        style={styles.fab}
+        onPress={() => pingMutation.mutate()}
+      />
+    </View>
   );
 }
 
