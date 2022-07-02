@@ -30,7 +30,6 @@ import {
 } from "react-query";
 import axios from "axios";
 import { getLogOutMutation, getUser, useGetUser } from "./api/api";
-import { ContactMessageList } from "./screens/ContactMessageList";
 export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
@@ -70,19 +69,6 @@ function Settings({ navigation }: { navigation: any }) {
   return <View></View>;
 }
 
-function ContactTabs() {
-  return (
-    <TopTab.Navigator>
-    <TopTab.Screen options={{
-      title: 'Information'
-    }} name="ContactList" component={ContactList} />
-    <TopTab.Screen options={{
-      title: 'List'
-    }} name="ContactMessageList" component={ContactMessageList} />
-  </TopTab.Navigator>
-  )
-}
-
 function Home() {
   return (
     <Tab.Navigator>
@@ -97,7 +83,7 @@ function Home() {
       />
       <Tab.Screen
         name="Contacts"
-        component={ContactTabs}
+        component={ContactList}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="list" size={24} color="black" />
@@ -116,16 +102,6 @@ function Home() {
     </Tab.Navigator>
   );
 }
-
-const TestScreen = () => {
-  return (
-    <View>
-      <Link to={{ screen: "TestScreena", params: { id: "jane" } }}>
-        Go to Jane's profile
-      </Link>
-    </View>
-  );
-};
 
 const linking = {
   enabled: true,

@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import axios, { AxiosRequestConfig } from "axios";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { queryClient } from "../App";
 
 export interface IMessage {
   duration: {
@@ -40,7 +39,7 @@ export interface IUser {
   _id?: string;
 }
 
-const apiUrl = `http://192.168.0.64:3000`;
+const apiUrl = `https://devbackend.laaksonen.eu`;
 
 const axiosOptions: AxiosRequestConfig = {
   withCredentials: true,
@@ -48,6 +47,7 @@ const axiosOptions: AxiosRequestConfig = {
 
 export const getLogOutMutation = () => {
   const navigation = useNavigation()
+  const queryClient = useQueryClient();
   const mutation = useMutation(logout, {
     onSuccess: (res: any) => {
       queryClient.invalidateQueries()
@@ -81,8 +81,17 @@ export const getUser = async (): Promise<IUser> => {
   return res.data;
 };
 
-export const pingServer = async (): Promise<Date> => {
-  const res = await axios.get(`${apiUrl}/api/user/ping`, {
+import * as Location from 'expo-location';
+
+export const pingServer = async (sendLocation = false): Promise<Date> => {
+  let location;
+  if (sendLocation) {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      location = await Location.getCurrentPositionAsync({});
+    }
+  }
+  const res = await axios.post(`${apiUrl}/api/user/ping`, location, {
     withCredentials: true,
   });
   return res.data;
@@ -121,10 +130,6 @@ export const getDeleteContactMutation = () => {
   })
   return mutation
 }
-
-export const setUserData = (data: IUser) => {
-  queryClient.setQueryData(["user"], data);
-};
 
 export const getCreateContactMutation = () => {
   const queryClient = useQueryClient();

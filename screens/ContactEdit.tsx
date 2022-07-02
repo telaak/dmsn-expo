@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import {
   Checkbox,
@@ -16,7 +17,13 @@ import {
 import { List } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import {
+  useForm,
+  Controller,
+  useFieldArray,
+  Control,
+  FieldValues,
+} from "react-hook-form";
 import { useQueryClient, useMutation, useQuery } from "react-query";
 import {
   getCreateContactMutation,
@@ -29,20 +36,9 @@ import {
 } from "../api/api";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import dayjs from "dayjs";
-
-const TextInputComponent = (props) => {
-  const [text, setText] = React.useState(props.value);
-
-  return (
-    <TextInput
-      label={props.label}
-      value={text}
-      onChangeText={(text) => setText(text)}
-      multiline={props.multiline}
-      numberOfLines={props.numberOfLines}
-    />
-  );
-};
+import { TextInputLabelProp } from "react-native-paper/lib/typescript/components/TextInput/types";
+import { KeyboardTypeOptions } from "react-native";
+import { IconProps } from "react-native-paper/lib/typescript/components/MaterialCommunityIcon";
 
 export function ContactEdit() {
   const route = useRoute();
@@ -126,8 +122,8 @@ export function ContactEdit() {
     append({
       content: "",
       duration: {
-        hours: 0,
         days: 3,
+        hours: 0,
         minutes: 0,
       },
     });
@@ -179,136 +175,59 @@ export function ContactEdit() {
             <List.Subheader>Contact Information</List.Subheader>
             <List.Item
               title={() => (
-                <Controller
-                  control={control}
-                  rules={{
-                    required: true,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      label="Name"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                    />
-                  )}
+                <ControlledTextField
                   name="name"
+                  control={control}
+                  label="Name"
+                  keyboardType="default"
                 />
               )}
-              left={() => <List.Icon icon="account" />}
+              left={() => <MaterialListIcon name="person" size={32} />}
             />
             <List.Item
               title={() => (
-                <Controller
-                  control={control}
-                  rules={{
-                    required: true,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      label="Email"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                    />
-                  )}
+                <ControlledTextField
                   name="email"
-                />
-              )}
-              left={() => <List.Icon icon="email" />}
-            />
-            <List.Item
-              title={() => (
-                <Controller
                   control={control}
-                  rules={{
-                    required: true,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      label="Phone Number"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      keyboardType="phone-pad"
-                    />
-                  )}
-                  name="phoneNumber"
+                  label="Email"
+                  keyboardType="email-address"
                 />
               )}
-              left={() => <List.Icon icon="phone" />}
+              left={() => <MaterialListIcon name="email" size={32} />}
             />
-
             <List.Item
               title={() => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <Controller
+                <ControlledTextField
+                  name="phoneNumber"
+                  control={control}
+                  label="Phone Nr."
+                  keyboardType="phone-pad"
+                />
+              )}
+              left={() => <MaterialListIcon name="phone" size={32} />}
+            />
+            <List.Item
+              title={() => (
+                <View style={styles.chipContainer}>
+                  <ToggleChip
                     control={control}
-                    render={({
-                      field: { onChange, onBlur, value, name, ref },
-                      fieldState: { invalid, isTouched, isDirty, error },
-                      formState,
-                    }) => (
-                      /*   <Checkbox.Android
-                      onPress={() => onChange(!value)}
-                      status={value ? "checked" : "unchecked"}
-                    /> */
-                      <Chip
-                        onPress={() => onChange(!value)}
-                        icon={() => (
-                          <MaterialIcons
-                            size={24}
-                            name={
-                              value ? "check-box" : "check-box-outline-blank"
-                            }
-                          />
-                        )}
-                      >
-                        Enable SMS
-                      </Chip>
-                    )}
                     name="smsEnabled"
+                    text="Send SMS"
                   />
-                  <Controller
+                  <ToggleChip
                     control={control}
-                    render={({
-                      field: { onChange, onBlur, value, name, ref },
-                      fieldState: { invalid, isTouched, isDirty, error },
-                      formState,
-                    }) => (
-                      /*   <Checkbox.Android
-                      onPress={() => onChange(!value)}
-                      status={value ? "checked" : "unchecked"}
-                    /> */
-                      <Chip
-                        onPress={() => onChange(!value)}
-                        icon={() => (
-                          <MaterialIcons
-                            size={24}
-                            name={
-                              value ? "check-box" : "check-box-outline-blank"
-                            }
-                          />
-                        )}
-                      >
-                        Enable Email
-                      </Chip>
-                    )}
                     name="emailEnabled"
+                    text="Send Email"
+                  />
+
+                  <ToggleChip
+                    control={control}
+                    name="sendLocation"
+                    text="Send Location"
                   />
                 </View>
               )}
-              left={() => (
-                <List.Icon
-                  icon={() => <MaterialIcons name="settings" size={32} />}
-                />
-              )}
+              left={() => <MaterialListIcon name="settings" size={32} />}
             />
 
             {fields.map((field, index) => {
@@ -333,11 +252,7 @@ export function ContactEdit() {
                         name={`messages.${index}.content`}
                       />
                     )}
-                    left={() => (
-                      <List.Icon
-                        icon={() => <MaterialIcons name="message" size={32} />}
-                      />
-                    )}
+                    left={() => <MaterialListIcon name="message" size={32} />}
                   ></List.Item>
 
                   <List.Item
@@ -380,18 +295,10 @@ export function ContactEdit() {
                         )}
                       </View>
                     )}
-                    left={() => (
-                      <List.Icon
-                        icon={() => <MaterialIcons name="schedule" size={32} />}
-                      />
-                    )}
+                    left={() => <MaterialListIcon name="schedule" size={32} />}
                   ></List.Item>
                   <List.Item
-                    left={() => (
-                      <List.Icon
-                        icon={() => <MaterialIcons name="delete" size={32} />}
-                      />
-                    )}
+                    left={() => <MaterialListIcon name="delete" size={32} />}
                     title={() => (
                       <View
                         style={{
@@ -426,7 +333,85 @@ export function ContactEdit() {
     </View>
   ) : (
     <View>
-      <Text>Asd</Text>
+      <ActivityIndicator animating={true} />
     </View>
   );
 }
+
+function MaterialListIcon(props: {
+  name: React.ComponentProps<typeof MaterialIcons>["name"];
+  size: number | undefined;
+}) {
+  return (
+    <List.Icon
+      icon={() => <MaterialIcons name={props.name} size={props.size} />}
+    />
+  );
+}
+
+function ToggleChip(props: {
+  control: Control<FieldValues, any> | undefined;
+  text: string;
+  name: string;
+}) {
+  return (
+    <Controller
+      control={props.control}
+      render={({
+        field: { onChange, onBlur, value, name, ref },
+        fieldState: { invalid, isTouched, isDirty, error },
+        formState,
+      }) => (
+        <Chip
+          onPress={() => onChange(!value)}
+          style={styles.chip}
+          icon={() => (
+            <MaterialIcons
+              size={24}
+              name={value ? "check-box" : "check-box-outline-blank"}
+            />
+          )}
+        >
+          {props.text}
+        </Chip>
+      )}
+      name={props.name}
+    />
+  );
+}
+
+function ControlledTextField(props: {
+  control: Control<FieldValues, any> | undefined;
+  label: TextInputLabelProp | undefined;
+  keyboardType: KeyboardTypeOptions;
+  name: string;
+}) {
+  return (
+    <Controller
+      control={props.control}
+      rules={{
+        required: true,
+      }}
+      render={({ field: { onChange, onBlur, value } }) => (
+        <TextInput
+          mode="outlined"
+          label={props.label}
+          onBlur={onBlur}
+          onChangeText={onChange}
+          value={value}
+          keyboardType={props.keyboardType}
+        />
+      )}
+      name={props.name}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  chip: { marginRight: 10, marginBottom: 10 },
+  chipContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+  },
+});

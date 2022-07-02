@@ -38,7 +38,7 @@ export function Login() {
 
 
   const checkLogin = useEffect(() => {
-   /* SecureStore.isAvailableAsync().then(async (isAvailable) => {
+    SecureStore.isAvailableAsync().then(async (isAvailable) => {
       if (isAvailable && !isSuccess && isError) {
         const result = await LocalAuthentication.authenticateAsync();
         if (result.success) {
@@ -46,8 +46,8 @@ export function Login() {
           mutation.mutate({ username, password });
         }
       }
-    }); */
-  });
+    });
+  }, [isError]);
 
   return (
     <View style={styles.container}>
