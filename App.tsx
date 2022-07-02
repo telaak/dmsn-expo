@@ -109,10 +109,22 @@ const linking = {
   },
 };
 
+const theme = {
+  ...DefaultTheme,
+  roundness: 2,
+  version: 3,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#3F51B5',
+    secondary: '#f1c40f',
+    tertiary: '#a1b2c3'
+  },
+};
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Provider theme={DefaultTheme}>
+      <Provider theme={theme}>
         <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
           <AuthGuard></AuthGuard>
           <StatusBar style="auto" />

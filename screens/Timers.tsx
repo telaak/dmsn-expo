@@ -152,24 +152,41 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   const timer = useEffect(() => {
     const interval = setInterval(() => {
       setTarget(targetDate.diff(dayjs()));
-    }, 100);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [targetDate]);
 
-  return <Text>{formatDuration(dayjs.duration(target).toISOString())}</Text>;
+  return (
+    <Text>
+      {target >= 0
+        ? `in ${formatDuration(dayjs.duration(target).toISOString())}`
+        : `${formatDuration(dayjs.duration(target).toISOString())} ago`}
+    </Text>
+  );
 };
+
+export interface IDuration {
+  days: number;
+  weeks: number;
+  months: number;
+  years: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  milliseconds: number;
+}
 
 export const mapDurationMessages = (contacts: IContact[]) => {
   const durations: Set<number> = new Set();
   for (const contact of contacts) {
-    contact.messages.forEach((m) => durations.add(m.duration));
+    contact.messages.forEach((m) => durations.add(dayjs.duration(m.duration).asMilliseconds()));
   }
   const mappedDurationMessages = Array.from(durations).map((d) => {
     const dateMessages: any[] = [];
     for (const contact of contacts) {
       for (const message of contact.messages) {
-        if (message.duration === d) {
+        if (dayjs.duration(message.duration).asMilliseconds() === d) {
           dateMessages.push({
             content: message.content,
             recipient: contact.name,
@@ -185,7 +202,13 @@ export const mapDurationMessages = (contacts: IContact[]) => {
       messages: dateMessages,
     };
   });
-  return mappedDurationMessages;
+  const sortedMessages = mappedDurationMessages.sort((a, b) => {
+    return (
+      dayjs.duration(a.duration).asMilliseconds() -
+      dayjs.duration(b.duration).asMilliseconds()
+    );
+  });
+  return sortedMessages;
 };
 
 const TimersList = () => {
@@ -235,7 +258,7 @@ export function Timers() {
       </ScrollView>
       <FAB
         icon={() => (
-          <MaterialCommunityIcons name="access-point-network" size={24} />
+          <MaterialCommunityIcons name="access-point-network" color='white' size={24} />
         )}
         style={styles.fab}
         onPress={() => pingMutation.mutate()}
@@ -250,5 +273,6 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
+    backgroundColor: '#3F51B5',                                    
   },
 });

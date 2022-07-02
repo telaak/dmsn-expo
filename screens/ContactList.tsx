@@ -104,7 +104,7 @@ export function ContactList() {
         </DataTable>
       </ScrollView>
       <FAB
-        icon={() => <MaterialCommunityIcons name="plus" size={24} />}
+        icon={() => <MaterialCommunityIcons name="plus" color='white' size={24} />}
         style={styles.fab}
         onPress={() => navigation.navigate("ContactEdit", { new: true })}
       />
@@ -184,5 +184,6 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
+    backgroundColor: '#3F51B5', 
   },
 });

@@ -13,6 +13,8 @@ import {
   Chip,
   Snackbar,
   Button,
+  Divider,
+  IconButton,
 } from "react-native-paper";
 import { List } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -122,9 +124,12 @@ export function ContactEdit() {
     append({
       content: "",
       duration: {
+        months: 0,
+        weeks: 0,
         days: 3,
         hours: 0,
         minutes: 0,
+        seconds: 0,
       },
     });
   };
@@ -229,7 +234,27 @@ export function ContactEdit() {
               )}
               left={() => <MaterialListIcon name="settings" size={32} />}
             />
-
+            <List.Item
+              title={() => (
+                <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <Button
+                  color="blue"
+                  mode="contained"
+                  onPress={() => addMessage()}
+                >
+                  Add message
+                </Button>
+              </View>
+              )}
+              left={() => <MaterialListIcon name="playlist-add" size={32} />}
+            />
+            <Divider />
             {fields.map((field, index) => {
               return (
                 <View key={field.id}>
@@ -278,7 +303,7 @@ export function ContactEdit() {
                                 }) => {
                                   return (
                                     <TextInput
-                                      style={{ minWidth: 65, marginRight: 10 }}
+                                      style={{ minWidth: 85, marginRight: 10 }}
                                       mode="outlined"
                                       label={`${durationKey}`}
                                       onBlur={onBlur}
@@ -320,13 +345,6 @@ export function ContactEdit() {
                 </View>
               );
             })}
-            <Button
-              icon={() => <MaterialIcons name="add" size={32} />}
-              mode="contained"
-              onPress={() => addMessage()}
-            >
-              Add New Message
-            </Button>
           </List.Section>
         </ScrollView>
       </KeyboardAwareScrollView>
