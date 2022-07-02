@@ -34,18 +34,19 @@ export function Login() {
     return [username, password];
   };
 
-  const navigation = useNavigation();
+  const { status, data, error, isSuccess, isLoading, isError } = useGetUser();
+
 
   const checkLogin = useEffect(() => {
-    SecureStore.isAvailableAsync().then(async (isAvailable) => {
-      if (isAvailable) {
+   /* SecureStore.isAvailableAsync().then(async (isAvailable) => {
+      if (isAvailable && !isSuccess && isError) {
         const result = await LocalAuthentication.authenticateAsync();
         if (result.success) {
           const [username, password] = await getCredentials();
           mutation.mutate({ username, password });
         }
       }
-    });
+    }); */
   });
 
   return (

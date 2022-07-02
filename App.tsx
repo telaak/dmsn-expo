@@ -29,7 +29,8 @@ import {
   useQueryClient,
 } from "react-query";
 import axios from "axios";
-import { getUser, useGetUser } from "./api/api";
+import { getLogOutMutation, getUser, useGetUser } from "./api/api";
+import { ContactMessageList } from "./screens/ContactMessageList";
 export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
@@ -42,44 +43,52 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
-function Feed() {
+function TimersScreen() {
   return <Timers></Timers>;
 }
 
 function Messages() {
   return (
     <TopTab.Navigator>
-      <TopTab.Screen name="Home" component={Profile} />
+      <TopTab.Screen name="Test Settings" component={Profile} />
       <TopTab.Screen name="Settings" component={Settings} />
     </TopTab.Navigator>
   );
 }
 
 function Profile() {
+  const logOutMutation = getLogOutMutation();
+
   return (
     <View>
-      <Text>Test3</Text>
+      <Button onPress={() => logOutMutation.mutate()}>Test</Button>
     </View>
   );
 }
 
 function Settings({ navigation }: { navigation: any }) {
+  return <View></View>;
+}
+
+function ContactTabs() {
   return (
-    <View>
-      <Button
-        title="Test button"
-        onPress={() => navigation.navigate("TestScreen")}
-      />
-    </View>
-  );
+    <TopTab.Navigator>
+    <TopTab.Screen options={{
+      title: 'Information'
+    }} name="ContactList" component={ContactList} />
+    <TopTab.Screen options={{
+      title: 'List'
+    }} name="ContactMessageList" component={ContactMessageList} />
+  </TopTab.Navigator>
+  )
 }
 
 function Home() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Feed"
-        component={Feed}
+        name="Timers"
+        component={TimersScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" size={24} color="black" />
@@ -88,7 +97,7 @@ function Home() {
       />
       <Tab.Screen
         name="Contacts"
-        component={ContactList}
+        component={ContactTabs}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="list" size={24} color="black" />
@@ -144,7 +153,7 @@ function AuthGuard() {
 
   return (
     <Stack.Navigator>
-      {isSuccess ? (
+      {isSuccess && data ? (
         <Stack.Group>
           <Stack.Screen
             name="Home"

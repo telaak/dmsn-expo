@@ -17,12 +17,12 @@ import { Button, Menu, Divider, Provider } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useQueryClient, useQuery } from "react-query";
-import { getUser } from "../api/api";
-import { IContact } from "./ContactEdit";
+import { getDeleteContactMutation, getUser, IContact } from "../api/api";
+import { useNavigation } from "@react-navigation/native";
 
 const numberOfItemsPerPageList = [1, 2, 3, 4];
 
-export function ContactList({ navigation }) {
+export function ContactList() {
   const [testData, setTestData] = React.useState<IContact[] | never[]>([] as IContact[])
 
   const columns = React.useMemo(
@@ -69,6 +69,8 @@ export function ContactList({ navigation }) {
     }
   };
 
+  const navigation = useNavigation()
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -92,28 +94,30 @@ export function ContactList({ navigation }) {
           ))}
           {rows.map((row, i) => {
             prepareRow(row);
-            return <RowView navigation={navigation} row={row} key={i} />;
+            return <RowView row={row} key={i} />;
           })}
         </DataTable>
       </ScrollView>
       <FAB
         icon={() => <MaterialCommunityIcons name="plus" size={24} />}
         style={styles.fab}
-        onPress={() => console.log("Pressed")}
+        onPress={() => navigation.navigate('ContactEdit', { new: true })}
       />
     </View>
   );
 }
 
-const RowView = ({ navigation, row }) => {
+const RowView = ( { row }) => {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const [anchor, setAnchor] = React.useState({ x: 0, y: 0 });
-
+  const navigation = useNavigation()
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
   };
+
+  const deleteMutation = getDeleteContactMutation()
 
   return (
     <Pressable
@@ -149,7 +153,7 @@ const RowView = ({ navigation, row }) => {
           <Divider />
           <Menu.Item
             icon={() => <MaterialIcons name="delete" size={24} />}
-            onPress={() => {}}
+            onPress={() => deleteMutation.mutate(row.original._id)}
             title="Delete"
           />
         </Menu>

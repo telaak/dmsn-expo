@@ -90,7 +90,7 @@ const AccordionList = ({
   messages: any;
   duration: number;
 }) => {
-  const [expanded, setExpanded] = React.useState(true);
+  const [expanded, setExpanded] = React.useState(false);
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
@@ -138,7 +138,7 @@ const AccordionList = ({
             )}
             key={i}
             title={m.recipient}
-            description={m.content.repeat(50)}
+            description={m.content}
             descriptionNumberOfLines={3}
           />
         );
@@ -205,7 +205,7 @@ const TimersList = () => {
   }, [status, data, lastPing]);
 
   return lastPing ? (
-    <List.Section title="Timers">
+    <List.Section>
       {durationMessages.map((dm, i) => (
         <AccordionList
           key={i}

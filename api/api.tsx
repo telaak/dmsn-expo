@@ -4,7 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { queryClient } from "../App";
 
 export interface IMessage {
-  duration: number;
+  duration: {
+    days: number,
+    weeks: number,
+    months: number,
+    years: number,
+    hours: number,
+    minutes: number,
+    seconds: number,
+    milliseconds: number
+  };
   content: string;
   _id?: string;
 }
@@ -37,10 +46,20 @@ const axiosOptions: AxiosRequestConfig = {
   withCredentials: true,
 };
 
+export const getLogOutMutation = () => {
+  const navigation = useNavigation()
+  const mutation = useMutation(logout, {
+    onSuccess: (res: any) => {
+      queryClient.invalidateQueries()
+    }
+  })
+  return mutation
+}
+
 export const useGetUser = () => {
     const navigation = useNavigation();
     return useQuery("user", getUser, {
-        onError: (err) => navigation.navigate('Login' as never),
+   //     onError: (err) => navigation.navigate('Login' as never),
         retry: 1
     });
 };
@@ -51,7 +70,7 @@ export const getLoginMutation = () => {
   const mutation = useMutation(login, {
     onSuccess: (data: any) => {
       queryClient.setQueryData(["user"], data.data);
-      navigation.navigate('Home' as never)
+     // navigation.navigate('Home' as never)
     },
   });
   return mutation;
@@ -69,6 +88,13 @@ export const pingServer = async (): Promise<Date> => {
   return res.data;
 };
 
+export const logout = async (): Promise<any> => {
+  console.log('logging out')
+  return axios.get(`${apiUrl}/api/user/logout`, {
+    withCredentials: true,
+  });
+};
+
 export const login = async (loginDetails: {
   username: string;
   password: string;
@@ -78,9 +104,34 @@ export const login = async (loginDetails: {
   });
 };
 
+export const deleteContact = async (id: string) => {
+  const res = await axios.delete(`${apiUrl}/api/user/contact/${id}`, {
+    withCredentials: true,
+  });
+  return res.data;
+}
+
+export const getDeleteContactMutation = () => {
+  const queryClient = useQueryClient();
+  const navigation = useNavigation();
+  const mutation = useMutation(deleteContact, {
+    onSuccess: (data: any) => {
+       queryClient.setQueryData(["user"], data);
+    }
+  })
+  return mutation
+}
+
 export const setUserData = (data: IUser) => {
   queryClient.setQueryData(["user"], data);
 };
+
+export const getCreateContactMutation = () => {
+  const queryClient = useQueryClient();
+  const navigation = useNavigation();
+  const mutation = useMutation(createContact)
+  return mutation
+}
 
 export const createContact = async (newContact: IContact) => {
   const res = await axios.post(`${apiUrl}/api/user/contact`, newContact, {
