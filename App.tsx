@@ -30,6 +30,7 @@ import {
 } from "react-query";
 import axios from "axios";
 import { getLogOutMutation, getUser, useGetUser } from "./api/api";
+import { UserSettings } from "./screens/UserSettings";
 export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
@@ -46,11 +47,11 @@ function TimersScreen() {
   return <Timers></Timers>;
 }
 
-function Messages() {
+function SettingsTabs() {
   return (
     <TopTab.Navigator>
-      <TopTab.Screen name="Test Settings" component={Profile} />
-      <TopTab.Screen name="Settings" component={Settings} />
+      <TopTab.Screen name="UserSettings" component={UserSettings} />
+      <TopTab.Screen name="ServerSettings" component={Profile} />
     </TopTab.Navigator>
   );
 }
@@ -65,9 +66,6 @@ function Profile() {
   );
 }
 
-function Settings({ navigation }: { navigation: any }) {
-  return <View></View>;
-}
 
 function Home() {
   return (
@@ -91,8 +89,8 @@ function Home() {
         }}
       />
       <Tab.Screen
-        name="Messages"
-        component={Messages}
+        name="Settings"
+        component={SettingsTabs}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="settings" size={24} color="black" />

@@ -21,7 +21,6 @@ import {
   pingServer,
   useGetUser,
 } from "../api/api";
-import _ from "lodash";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
