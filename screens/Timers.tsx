@@ -7,15 +7,21 @@ import {
   StyleSheet,
   Text,
 } from "react-native";
-import { Button, FAB, List } from "react-native-paper";
+import { ActivityIndicator, Button, FAB, List } from "react-native-paper";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import axios from "axios";
-import { getUser, IContact, IMessage, pingServer } from "../api/api";
-import _ from 'lodash';
+import {
+  getUser,
+  IContact,
+  IMessage,
+  pingServer,
+  useGetUser,
+} from "../api/api";
+import _ from "lodash";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -67,11 +73,12 @@ function formatDuration(period: string) {
 }
 
 export interface IDurationMessage {
+  messages: any;
   content: string;
   recipient: string;
   emailEnabled: boolean;
   smsEnabled: boolean;
-  duration: number
+  duration: number;
 }
 
 const AccordionList = ({
@@ -83,7 +90,7 @@ const AccordionList = ({
   messages: any;
   duration: number;
 }) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(true);
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
@@ -146,10 +153,10 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
   const timer = useEffect(() => {
     const interval = setInterval(() => {
       setTarget(targetDate.diff(dayjs()));
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [targetDate]);
 
   return <Text>{formatDuration(dayjs.duration(target).toISOString())}</Text>;
 };
@@ -157,7 +164,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: dayjs.Dayjs }) => {
 export const mapDurationMessages = (contacts: IContact[]) => {
   const durations: Set<number> = new Set();
   for (const contact of contacts) {
-    contact.messages.forEach((m) => durations.add(m.duration))
+    contact.messages.forEach((m) => durations.add(m.duration));
   }
   const mappedDurationMessages = Array.from(durations).map((d) => {
     const dateMessages: any[] = [];
@@ -179,47 +186,48 @@ export const mapDurationMessages = (contacts: IContact[]) => {
       messages: dateMessages,
     };
   });
-  return mappedDurationMessages
-}
+  return mappedDurationMessages;
+};
 
 const TimersList = () => {
-  const { status, data, error, isSuccess } = useQuery("user", getUser);
+  const { status, data, error, isSuccess } = useGetUser();
 
   const [lastPing, setLastPing] = useState<Date>(new Date());
-  const [durationMessages, setDurationMessages] = useState<IDurationMessage[]>([]);
+  const [durationMessages, setDurationMessages] = useState<any[]>([]);
 
   const getContacts = useEffect(() => {
     if (status === "success") {
-      const contacts: IContact[] = data.contacts
+      const contacts: IContact[] = data.contacts;
       setLastPing(data.lastPing);
-      setDurationMessages(mapDurationMessages(contacts))
+      const mappedMessages = mapDurationMessages(contacts);
+      setDurationMessages(mappedMessages);
     }
   }, [status, data, lastPing]);
 
-  return (
-    lastPing ? 
+  return lastPing ? (
     <List.Section title="Timers">
-      <List.Item title={() => <Text>{lastPing ? dayjs(lastPing).format() : ''}</Text>} />
       {durationMessages.map((dm, i) => (
         <AccordionList
-          key={dayjs(lastPing).valueOf() + i}
+          key={i}
           messages={dm.messages}
           targetDate={dayjs(lastPing).add(dayjs.duration(dm.duration))}
           duration={dm.duration}
         />
       ))}
-    </List.Section> : <View></View>
+    </List.Section>
+  ) : (
+    <ActivityIndicator animating={true} />
   );
 };
 
 export function Timers() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const pingMutation = useMutation(pingServer, {
     onSuccess: (newTimestamp: Date) => {
-      console.log(newTimestamp)
-      queryClient.invalidateQueries('user')
+      console.log(newTimestamp);
+      queryClient.invalidateQueries("user");
     },
-  })
+  });
 
   return (
     <View style={{ flex: 1 }}>

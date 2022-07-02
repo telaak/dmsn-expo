@@ -132,9 +132,9 @@ const RowView = ({ navigation, row }) => {
             icon={() => <MaterialIcons name="edit" size={24} />}
             onPress={() => {
               navigation.navigate("ContactEdit", {
-                data: JSON.stringify(row.original),
+                id: row.original._id
               });
-              closeMenu();
+               closeMenu();
             }}
             title="Edit"
           />

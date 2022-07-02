@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   },
 });
 
+import { useNavigation } from "@react-navigation/native";
 import * as LocalAuthentication from "expo-local-authentication";
 
 //SecureStore.setItemAsync("username", "Test");
@@ -16,21 +17,14 @@ import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useEffect, useReducer, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { Button, TextInput } from "react-native-paper";
+import { ActivityIndicator, Button, TextInput } from "react-native-paper";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { login } from "../api/api";
+import { getLoginMutation, useGetUser } from "../api/api";
 
 export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation(login, {
-    onSuccess: (data: any) => {
-      queryClient.setQueryData(["user"], data.data);
-    },
-  });
+  const mutation = getLoginMutation();
 
   const getCredentials = async () => {
     const [username, password] = await Promise.all([
@@ -40,21 +34,19 @@ export function Login() {
     return [username, password];
   };
 
-  const loginFn = async () => {
-    const loginResult = await mutation.mutateAsync({ username, password });
-  };
+  const navigation = useNavigation();
 
-  const fingerPrintLogin = useEffect(() => {
+  const checkLogin = useEffect(() => {
     SecureStore.isAvailableAsync().then(async (isAvailable) => {
       if (isAvailable) {
         const result = await LocalAuthentication.authenticateAsync();
         if (result.success) {
           const [username, password] = await getCredentials();
-          await mutation.mutateAsync({ username, password });
+          mutation.mutate({ username, password });
         }
       }
     });
-  }, []);
+  });
 
   return (
     <View style={styles.container}>
@@ -73,7 +65,11 @@ export function Login() {
           value={password}
           onChangeText={setPassword}
         />
-        <Button icon="login" mode="contained" onPress={() => loginFn()}>
+        <Button
+          icon="login"
+          mode="contained"
+          onPress={() => mutation.mutate({ username, password })}
+        >
           Login
         </Button>
       </View>

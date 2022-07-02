@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
@@ -19,11 +19,17 @@ import {
   DarkTheme,
   TextInput,
   Button,
+  ActivityIndicator,
 } from "react-native-paper";
 import { Login } from "./screens/Login";
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 import axios from "axios";
-import { getUser } from "./api/api";
+import { getUser, useGetUser } from "./api/api";
 export const queryClient = new QueryClient();
 
 ScreenOrientation.getPlatformOrientationLockAsync().then((orientation) => {
@@ -123,33 +129,32 @@ const linking = {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-          <Provider theme={DefaultTheme}>
-            <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
-              <AuthGuard></AuthGuard>
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </Provider>
+      <Provider theme={DefaultTheme}>
+        <NavigationContainer linking={{ enabled: true, prefixes: [] }}>
+          <AuthGuard></AuthGuard>
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </Provider>
     </QueryClientProvider>
   );
 }
 
 function AuthGuard() {
-  const queryClient = useQueryClient();
-  const { status, data, error, isSuccess } = useQuery("user", getUser)
+  const { status, data, error, isSuccess, isLoading, isError } = useGetUser();
+
   return (
     <Stack.Navigator>
-      {!isSuccess ? (
-        <Stack.Screen name="Login" component={Login} />
-      ) : (
+      {isSuccess ? (
         <Stack.Group>
           <Stack.Screen
             name="Home"
             component={Home}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="TestScreen" component={TestScreen} />
           <Stack.Screen name="ContactEdit" component={ContactEdit} />
         </Stack.Group>
+      ) : (
+        <Stack.Screen name="Login" component={Login} />
       )}
     </Stack.Navigator>
   );

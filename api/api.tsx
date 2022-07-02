@@ -1,5 +1,6 @@
+import { useNavigation } from "@react-navigation/native";
 import axios, { AxiosRequestConfig } from "axios";
-import { useMutation } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { queryClient } from "../App";
 
 export interface IMessage {
@@ -34,6 +35,26 @@ const apiUrl = `http://192.168.0.64:3000`;
 
 const axiosOptions: AxiosRequestConfig = {
   withCredentials: true,
+};
+
+export const useGetUser = () => {
+    const navigation = useNavigation();
+    return useQuery("user", getUser, {
+        onError: (err) => navigation.navigate('Login' as never),
+        retry: 1
+    });
+};
+
+export const getLoginMutation = () => {
+  const queryClient = useQueryClient();
+  const navigation = useNavigation();
+  const mutation = useMutation(login, {
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["user"], data.data);
+      navigation.navigate('Home' as never)
+    },
+  });
+  return mutation;
 };
 
 export const getUser = async (): Promise<IUser> => {
