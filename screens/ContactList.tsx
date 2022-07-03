@@ -3,26 +3,19 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableHighlight,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   Pressable,
   StyleSheet,
 } from "react-native";
 import {
-  Badge,
   DataTable,
   FAB,
-  List,
-  TouchableRipple,
 } from "react-native-paper";
 import { Row, useSortBy, useTable } from "react-table";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { Button, Menu, Divider, Provider } from "react-native-paper";
+import { Menu, Divider } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import axios from "axios";
-import { useQueryClient, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { getDeleteContactMutation, getUser, IContact } from "../api/api";
 import { useNavigation } from "@react-navigation/native";
 

@@ -2,20 +2,17 @@ import React, { useEffect, useState } from "react";
 import {
   LayoutAnimation,
   ScrollView,
-  UIManager,
   View,
   StyleSheet,
   Text,
 } from "react-native";
-import { ActivityIndicator, Button, FAB, List } from "react-native-paper";
+import { ActivityIndicator, FAB, List } from "react-native-paper";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import axios from "axios";
+import { useMutation, useQueryClient } from "react-query";
 import {
-  getUser,
   IContact,
   IMessage,
   pingServer,

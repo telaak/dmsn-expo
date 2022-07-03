@@ -28,10 +28,10 @@ export function Login() {
 
   const getCredentials = async () => {
     const [username, password] = await Promise.all([
-      SecureStore.getItemAsync("username"),
-      SecureStore.getItemAsync("password"),
+      SecureStore.getItemAsync("username") as Promise<string>,
+      SecureStore.getItemAsync("password") as Promise<string>,
     ]);
-    return [username, password];
+    return { username, password };
   };
 
   const { status, data, error, isSuccess, isLoading, isError } = useGetUser();
@@ -42,7 +42,7 @@ export function Login() {
       if (isAvailable && !isSuccess && isError) {
         const result = await LocalAuthentication.authenticateAsync();
         if (result.success) {
-          const [username, password] = await getCredentials();
+          const { username, password } = await getCredentials();
           mutation.mutate({ username, password });
         }
       }

@@ -59,8 +59,8 @@ export const getLogOutMutation = () => {
 export const useGetUser = () => {
     const navigation = useNavigation();
     return useQuery("user", getUser, {
-   //     onError: (err) => navigation.navigate('Login' as never),
-        retry: 1
+       // onError: (err) => navigation.navigate('Login' as never),
+        retry: 1,
     });
 };
 
@@ -83,7 +83,8 @@ export const getUser = async (): Promise<IUser> => {
 
 import * as Location from 'expo-location';
 
-export const pingServer = async (sendLocation = false): Promise<Date> => {
+export const pingServer = async (): Promise<Date> => {
+  const sendLocation = false
   let location;
   if (sendLocation) {
     let { status } = await Location.requestForegroundPermissionsAsync();

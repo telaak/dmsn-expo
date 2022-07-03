@@ -134,12 +134,14 @@ export default function App() {
   );
 }
 
+export let loggedIn = false
+
 function AuthGuard() {
   const { status, data, error, isSuccess, isLoading, isError } = useGetUser();
 
   return (
     <Stack.Navigator>
-      {isSuccess && data ? (
+      {isSuccess ? (
         <Stack.Group>
           <Stack.Screen
             name="Home"

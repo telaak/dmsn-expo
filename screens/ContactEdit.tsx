@@ -1,30 +1,23 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import {
-  Checkbox,
   TextInput,
-  Text,
-  Chip,
   Snackbar,
   Button,
   Divider,
-  IconButton,
 } from "react-native-paper";
 import { List } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   useForm,
   Controller,
   useFieldArray,
-  Control,
-  FieldValues,
 } from "react-hook-form";
 import { useQueryClient, useMutation, useQuery } from "react-query";
 import {
@@ -32,15 +25,12 @@ import {
   getUser,
   IContact,
   IUser,
-  login,
   updateContact,
-  useGetUser,
 } from "../api/api";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import dayjs from "dayjs";
-import { TextInputLabelProp } from "react-native-paper/lib/typescript/components/TextInput/types";
-import { KeyboardTypeOptions } from "react-native";
-import { IconProps } from "react-native-paper/lib/typescript/components/MaterialCommunityIcon";
+import { ControlledTextField } from "../components/ControlledTextField";
+import { ToggleChip } from "../components/ToggleChip";
+import { MaterialListIcon } from "../components/MaterialListIcon";
 
 export function ContactEdit() {
   const route = useRoute();
@@ -356,74 +346,7 @@ export function ContactEdit() {
   );
 }
 
-function MaterialListIcon(props: {
-  name: React.ComponentProps<typeof MaterialIcons>["name"];
-  size: number | undefined;
-}) {
-  return (
-    <List.Icon
-      icon={() => <MaterialIcons name={props.name} size={props.size} />}
-    />
-  );
-}
 
-function ToggleChip(props: {
-  control: Control<FieldValues, any> | undefined;
-  text: string;
-  name: string;
-}) {
-  return (
-    <Controller
-      control={props.control}
-      render={({
-        field: { onChange, onBlur, value, name, ref },
-        fieldState: { invalid, isTouched, isDirty, error },
-        formState,
-      }) => (
-        <Chip
-          onPress={() => onChange(!value)}
-          style={styles.chip}
-          icon={() => (
-            <MaterialIcons
-              size={24}
-              name={value ? "check-box" : "check-box-outline-blank"}
-            />
-          )}
-        >
-          {props.text}
-        </Chip>
-      )}
-      name={props.name}
-    />
-  );
-}
-
-function ControlledTextField(props: {
-  control: Control<FieldValues, any> | undefined;
-  label: TextInputLabelProp | undefined;
-  keyboardType: KeyboardTypeOptions;
-  name: string;
-}) {
-  return (
-    <Controller
-      control={props.control}
-      rules={{
-        required: true,
-      }}
-      render={({ field: { onChange, onBlur, value } }) => (
-        <TextInput
-          mode="outlined"
-          label={props.label}
-          onBlur={onBlur}
-          onChangeText={onChange}
-          value={value}
-          keyboardType={props.keyboardType}
-        />
-      )}
-      name={props.name}
-    />
-  );
-}
 
 const styles = StyleSheet.create({
   chip: { marginRight: 10, marginBottom: 10 },
