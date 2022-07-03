@@ -1,15 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-} from "react-native";
-import {
-  DataTable,
-  FAB,
-} from "react-native-paper";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { DataTable, FAB } from "react-native-paper";
 import { Row, useSortBy, useTable } from "react-table";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
@@ -97,7 +88,9 @@ export function ContactList() {
         </DataTable>
       </ScrollView>
       <FAB
-        icon={() => <MaterialCommunityIcons name="plus" color='white' size={24} />}
+        icon={() => (
+          <MaterialCommunityIcons name="plus" color="white" size={24} />
+        )}
         style={styles.fab}
         onPress={() => navigation.navigate("ContactEdit", { new: true })}
       />
@@ -149,13 +142,16 @@ const RowView = (props: { row: Row<IContact> }) => {
             title="Copy"
           />
           <Divider />
-          <Menu.Item
-            icon={() => <MaterialIcons name="delete" size={24} />}
-            onPress={() =>
+          <Pressable
+            onLongPress={() =>
               deleteMutation.mutate(props.row.original._id as string)
             }
-            title="Delete"
-          />
+          >
+            <Menu.Item
+              icon={() => <MaterialIcons name="delete" size={24} />}
+              title="Delete"
+            />
+          </Pressable>
         </Menu>
       </View>
       <DataTable.Row>
@@ -177,6 +173,6 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#3F51B5', 
+    backgroundColor: "#3F51B5",
   },
 });

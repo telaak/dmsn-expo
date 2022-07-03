@@ -40,7 +40,10 @@
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "0.17.7",
     "react-query": "^3.39.1",
-    "react-table": "^7.8.0"
+    "react-table": "^7.8.0",
+    "expo-notifications": "~0.15.4",
+    "expo-device": "~4.2.0",
+    "@react-native-async-storage/async-storage": "~1.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

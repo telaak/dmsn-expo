@@ -1,24 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-import {
-  TextInput,
-  Snackbar,
-  Button,
-  Divider,
-} from "react-native-paper";
+import { View, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
+import { TextInput, Snackbar, Button, Divider } from "react-native-paper";
 import { List } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MaterialIcons } from "@expo/vector-icons";
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-} from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useQueryClient, useMutation, useQuery } from "react-query";
 import {
   getCreateContactMutation,
@@ -175,6 +161,7 @@ export function ContactEdit() {
                   control={control}
                   label="Name"
                   keyboardType="default"
+                  required={true}
                 />
               )}
               left={() => <MaterialListIcon name="person" size={32} />}
@@ -186,6 +173,7 @@ export function ContactEdit() {
                   control={control}
                   label="Email"
                   keyboardType="email-address"
+                  required={false}
                 />
               )}
               left={() => <MaterialListIcon name="email" size={32} />}
@@ -197,6 +185,7 @@ export function ContactEdit() {
                   control={control}
                   label="Phone Nr."
                   keyboardType="phone-pad"
+                  required={false}
                 />
               )}
               left={() => <MaterialListIcon name="phone" size={32} />}
@@ -227,20 +216,20 @@ export function ContactEdit() {
             <List.Item
               title={() => (
                 <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  justifyContent: "flex-start",
-                }}
-              >
-                <Button
-                  color="blue"
-                  mode="contained"
-                  onPress={() => addMessage()}
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    justifyContent: "flex-start",
+                  }}
                 >
-                  Add message
-                </Button>
-              </View>
+                  <Button
+                    color="#49599a"
+                    mode="contained"
+                    onPress={() => addMessage()}
+                  >
+                    Add message
+                  </Button>
+                </View>
               )}
               left={() => <MaterialListIcon name="playlist-add" size={32} />}
             />
@@ -323,7 +312,7 @@ export function ContactEdit() {
                         }}
                       >
                         <Button
-                          color="red"
+                          color="#ef5350"
                           mode="contained"
                           onPress={() => remove(index)}
                         >
@@ -345,8 +334,6 @@ export function ContactEdit() {
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   chip: { marginRight: 10, marginBottom: 10 },

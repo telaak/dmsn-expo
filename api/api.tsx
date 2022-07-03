@@ -4,14 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 
 export interface IMessage {
   duration: {
-    days: number,
-    weeks: number,
-    months: number,
-    years: number,
-    hours: number,
-    minutes: number,
-    seconds: number,
-    milliseconds: number
+    days: number;
+    weeks: number;
+    months: number;
+    years: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    milliseconds: number;
   };
   content: string;
   _id?: string;
@@ -33,10 +33,33 @@ export interface IUser {
   password: string;
   contacts: IContact[];
   lastPing: Date;
+  lastLocation: ILocation
+  settings: IUserSettings
   comparePassword: Function;
   ping: Function;
   setPushToken: Function;
   _id?: string;
+}
+
+export interface IUserSettings {
+  email: string;
+  phoneNumber: string;
+  enablePushNotifications: boolean;
+  enableEmailNotifications: boolean;
+  enableSMSNotifications: boolean;
+}
+
+export interface ILocation {
+  coords: {
+    accuracy: number;
+    altitude: number;
+    altitudeAccuracy: number;
+    heading: number;
+    latitude: number;
+    longitude: number;
+    speed: number;
+  };
+  timestamp: Date;
 }
 
 const apiUrl = `https://devbackend.laaksonen.eu`;
@@ -46,22 +69,35 @@ const axiosOptions: AxiosRequestConfig = {
 };
 
 export const getLogOutMutation = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const queryClient = useQueryClient();
   const mutation = useMutation(logout, {
     onSuccess: (res: any) => {
-      queryClient.invalidateQueries()
-    }
-  })
-  return mutation
-}
+      queryClient.invalidateQueries();
+    },
+  });
+  return mutation;
+};
+
+export const getUpdatePushTokenMutation = () => {
+  const mutation = useMutation(updatePushToken);
+  return mutation;
+};
+
+export const updatePushToken = (pushToken: string) => {
+  return axios.post(
+    `${apiUrl}/api/user/pushToken`,
+    { pushToken },
+    axiosOptions
+  );
+};
 
 export const useGetUser = () => {
-    const navigation = useNavigation();
-    return useQuery("user", getUser, {
-       // onError: (err) => navigation.navigate('Login' as never),
-        retry: 1,
-    });
+  const navigation = useNavigation();
+  return useQuery("user", getUser, {
+    // onError: (err) => navigation.navigate('Login' as never),
+    retry: 1,
+  });
 };
 
 export const getLoginMutation = () => {
@@ -70,7 +106,7 @@ export const getLoginMutation = () => {
   const mutation = useMutation(login, {
     onSuccess: (data: any) => {
       queryClient.setQueryData(["user"], data.data);
-     // navigation.navigate('Home' as never)
+      // navigation.navigate('Home' as never)
     },
   });
   return mutation;
@@ -81,14 +117,15 @@ export const getUser = async (): Promise<IUser> => {
   return res.data;
 };
 
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const pingServer = async (): Promise<Date> => {
-  const sendLocation = false
+  const sendLocation = await AsyncStorage.getItem("localSettings");
   let location;
   if (sendLocation) {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status === 'granted') {
+    if (status === "granted") {
       location = await Location.getCurrentPositionAsync({});
     }
   }
@@ -99,7 +136,7 @@ export const pingServer = async (): Promise<Date> => {
 };
 
 export const logout = async (): Promise<any> => {
-  console.log('logging out')
+  console.log("logging out");
   return axios.get(`${apiUrl}/api/user/logout`, {
     withCredentials: true,
   });
@@ -119,25 +156,25 @@ export const deleteContact = async (id: string) => {
     withCredentials: true,
   });
   return res.data;
-}
+};
 
 export const getDeleteContactMutation = () => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const mutation = useMutation(deleteContact, {
     onSuccess: (data: any) => {
-       queryClient.setQueryData(["user"], data);
-    }
-  })
-  return mutation
-}
+      queryClient.setQueryData(["user"], data);
+    },
+  });
+  return mutation;
+};
 
 export const getCreateContactMutation = () => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-  const mutation = useMutation(createContact)
-  return mutation
-}
+  const mutation = useMutation(createContact);
+  return mutation;
+};
 
 export const createContact = async (newContact: IContact) => {
   const res = await axios.post(`${apiUrl}/api/user/contact`, newContact, {
@@ -153,6 +190,27 @@ export const updateContact = async (partialContact: Partial<IContact>) => {
     {
       withCredentials: true,
     }
+  );
+  return res.data;
+};
+
+export const getUpdateUserSettingsMutation = async () => {
+  const queryClient = useQueryClient()
+  const mutation = useMutation(updateUserSettings, {
+    onSuccess: (data: IUser) => {
+      queryClient.setQueryData('user', data)
+    }
+  })
+  return mutation
+}
+
+export const updateUserSettings = async (
+  partialSettings: Partial<IUserSettings>
+) => {
+  const res = await axios.patch(
+    `${apiUrl}/api/user/settings`,
+    partialSettings,
+    axiosOptions
   );
   return res.data;
 };

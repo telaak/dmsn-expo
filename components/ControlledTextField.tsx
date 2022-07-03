@@ -9,12 +9,13 @@ export function ControlledTextField(props: {
     label: TextInputLabelProp | undefined;
     keyboardType: KeyboardTypeOptions;
     name: string;
+    required: boolean
   }) {
     return (
       <Controller
         control={props.control}
         rules={{
-          required: true,
+          required: props.required,
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
