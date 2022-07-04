@@ -213,26 +213,6 @@ export function ContactEdit() {
               )}
               left={() => <MaterialListIcon name="settings" size={32} />}
             />
-            <List.Item
-              title={() => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <Button
-                    color="#49599a"
-                    mode="contained"
-                    onPress={() => addMessage()}
-                  >
-                    Add message
-                  </Button>
-                </View>
-              )}
-              left={() => <MaterialListIcon name="playlist-add" size={32} />}
-            />
             <Divider />
             {fields.map((field, index) => {
               return (
@@ -312,7 +292,7 @@ export function ContactEdit() {
                         }}
                       >
                         <Button
-                          color="#ef5350"
+                          color="red"
                           mode="contained"
                           onPress={() => remove(index)}
                         >
@@ -324,6 +304,26 @@ export function ContactEdit() {
                 </View>
               );
             })}
+            <List.Item
+              title={() => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Button
+                    color="#49599a"
+                    mode="contained"
+                    onPress={() => addMessage()}
+                  >
+                    Add message
+                  </Button>
+                </View>
+              )}
+              left={() => <MaterialListIcon name="playlist-add" size={32} />}
+            />
           </List.Section>
         </ScrollView>
       </KeyboardAwareScrollView>

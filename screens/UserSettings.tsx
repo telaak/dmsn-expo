@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { ControlledTextField } from "../components/ControlledTextField";
 import { ToggleChip } from "../components/ToggleChip";
 import { StyleSheet } from "react-native";
 import { MaterialListIcon } from "../components/MaterialListIcon";
-import { Button, List } from "react-native-paper";
-import { getUpdateUserSettingsMutation, getUser, IContact, IUser } from "../api/api";
-import { queryClient } from "../App";
+import { Button, FAB, List } from "react-native-paper";
+import {
+  getUpdateUserSettingsMutation,
+  getUser,
+  IContact,
+  IUser,
+} from "../api/api";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export const UserSettings = () => {
   const {
@@ -31,11 +36,7 @@ export const UserSettings = () => {
 
   useEffect(() => {});
 
-  return (
-    <KeyboardAwareScrollView>
-      <ExtraSettings />
-    </KeyboardAwareScrollView>
-  );
+  return <ExtraSettings />;
 };
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -58,82 +59,87 @@ const ExtraSettings = () => {
 
   useEffect(() => {
     if (isSuccess) {
-        const settings = data.settings
-        reset(settings)
+      const settings = data.settings;
+      reset(settings);
     }
-  }, [isSuccess])
+  }, [isSuccess]);
 
   return (
-    <View>
-      <List.Subheader>User</List.Subheader>
-      <List.Item
-        title={() => (
-          <ControlledTextField
-            required={false}
-            control={control}
-            label="Email"
-            name="email"
-            keyboardType="email-address"
-          />
-        )}
-        left={() => <MaterialListIcon name="email" size={32} />}
-      />
-      <List.Item
-        title={() => (
-          <ControlledTextField
-            required={false}
-            control={control}
-            label="Phone Nr."
-            name="phoneNumber"
-            keyboardType="phone-pad"
-          />
-        )}
-        left={() => <MaterialListIcon name="phone" size={32} />}
-      />
-      <List.Subheader>Notifications</List.Subheader>
-      <List.Item
-        title={() => (
-          <View style={styles.chipContainer}>
-            <ToggleChip
+    <View style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <List.Subheader>User</List.Subheader>
+        <List.Item
+          title={() => (
+            <ControlledTextField
+              required={false}
               control={control}
-              text="Push"
-              name="enablePushNotifications"
+              label="Email"
+              name="email"
+              keyboardType="email-address"
             />
-            <ToggleChip
+          )}
+          left={() => <MaterialListIcon name="email" size={32} />}
+        />
+        <List.Item
+          title={() => (
+            <ControlledTextField
+              required={false}
               control={control}
-              text="Email"
-              name="enableEmailNotifications"
+              label="Phone Nr."
+              name="phoneNumber"
+              keyboardType="phone-pad"
             />
-            <ToggleChip
-              control={control}
-              text="SMS"
-              name="enableSMSNotifications"
-            />
-          </View>
-        )}
-        left={() => <MaterialListIcon name="notifications" size={32} />}
-      />
-      <List.Item
-        title={() => (
-          <View style={styles.chipContainer}>
-            <Button
-              icon={() => <MaterialIcons name="save" size={24} color="white" />}
-              mode="contained"
-              onPress={handleSubmit(async (valid) => {
-                if (valid) {
-                  try {
-                    (await updateSettingsMutation).mutate(valid);
-                  } catch (e) {
-                    console.log(e);
-                  }
-                }
-              })}
-            >
-              Save
-            </Button>
-          </View>
-        )}
-        left={() => <MaterialListIcon name="settings" size={32} />}
+          )}
+          left={() => <MaterialListIcon name="phone" size={32} />}
+        />
+        <List.Subheader>Notifications</List.Subheader>
+        <List.Item
+          title={() => (
+            <View style={styles.chipContainer}>
+              <ToggleChip
+                control={control}
+                text="Push"
+                name="enablePushNotifications"
+              />
+              <ToggleChip
+                control={control}
+                text="Email"
+                name="enableEmailNotifications"
+              />
+              <ToggleChip
+                control={control}
+                text="SMS"
+                name="enableSMSNotifications"
+              />
+            </View>
+          )}
+          left={() => <MaterialListIcon name="notifications" size={32} />}
+        />
+        <List.Item
+          title={() => (
+            <View style={styles.chipContainer}>
+              <ToggleChip
+                control={control}
+                text="Enable DMS"
+                name="enableDMS"
+              />
+            </View>
+          )}
+          left={() => <MaterialListIcon name="settings" size={32} />}
+        />
+      </KeyboardAwareScrollView>
+      <FAB
+        icon={() => <MaterialIcons name="save" color="white" size={24} />}
+        style={styles.fab}
+        onPress={handleSubmit(async (valid) => {
+          if (valid) {
+            try {
+              (await updateSettingsMutation).mutate(valid);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        })}
       />
     </View>
   );
@@ -145,5 +151,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
+  },
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#3F51B5",
   },
 });
