@@ -121,14 +121,20 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const pingServer = async (): Promise<Date> => {
-  const sendLocation = await AsyncStorage.getItem("localSettings");
+  const localSettings = await AsyncStorage.getItem("localSettings") as string;
   let location;
-  if (sendLocation) {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status === "granted") {
-      location = await Location.getCurrentPositionAsync({});
+  try {
+    const parsedSettings = JSON.parse(localSettings)
+    if (parsedSettings.sendLocation) {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        location = await Location.getCurrentPositionAsync({});
+      }
     }
+  } catch (error) {
+    console.log(error)
   }
+
   const res = await axios.post(`${apiUrl}/api/user/ping`, location, {
     withCredentials: true,
   });
