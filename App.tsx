@@ -71,6 +71,7 @@ function Home() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" size={24} color="black" />
           ),
+          lazy: false,
         }}
       />
       <Tab.Screen
@@ -80,6 +81,7 @@ function Home() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="list" size={24} color="black" />
           ),
+          lazy: false,
         }}
       />
       <Tab.Screen
@@ -89,6 +91,7 @@ function Home() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="settings" size={24} color="black" />
           ),
+          lazy: false,
         }}
       />
     </Tab.Navigator>
@@ -190,7 +193,7 @@ function AuthGuard() {
   const updateTokenMutation = getUpdatePushTokenMutation();
 
   useEffect(() => {
-    if (Device.isDevice && Platform.OS === 'ios') {
+    if (isSuccess && Device.isDevice && Platform.OS === "ios") {
       registerForPushNotificationsAsync().then((token) => {
         updateTokenMutation.mutate(token as string);
       });

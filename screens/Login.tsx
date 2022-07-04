@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   },
 });
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import * as LocalAuthentication from "expo-local-authentication";
 
@@ -36,14 +37,23 @@ export function Login() {
 
   const { status, data, error, isSuccess, isLoading, isError } = useGetUser();
 
-
   const checkLogin = useEffect(() => {
     SecureStore.isAvailableAsync().then(async (isAvailable) => {
       if (isAvailable && !isSuccess && isError) {
-        const result = await LocalAuthentication.authenticateAsync();
-        if (result.success) {
-          const { username, password } = await getCredentials();
-          mutation.mutate({ username, password });
+        const localSettings = (await AsyncStorage.getItem(
+          "localSettings"
+        )) as string;
+        try {
+          const parsedLocalSettings = JSON.parse(localSettings);
+          if (parsedLocalSettings.useFingerprint) {
+            const result = await LocalAuthentication.authenticateAsync();
+            if (result.success) {
+              const { username, password } = await getCredentials();
+              mutation.mutate({ username, password });
+            }
+          }
+        } catch (error) {
+          console.log(error);
         }
       }
     });
