@@ -7,7 +7,7 @@ COPY tsconfig.json ./
 
 RUN npm install && npm install -g expo-cli serve
 
-RUN npx expo publish:web
+RUN npx expo build:web
 
 COPY . .
 
