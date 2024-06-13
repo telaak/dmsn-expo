@@ -33,8 +33,8 @@ export interface IUser {
   password: string;
   contacts: IContact[];
   lastPing: Date;
-  lastLocation: ILocation
-  settings: IUserSettings
+  lastLocation: ILocation;
+  settings: IUserSettings;
   comparePassword: Function;
   ping: Function;
   setPushToken: Function;
@@ -100,6 +100,8 @@ export const useGetUser = () => {
   });
 };
 
+import * as SecureStore from "expo-secure-store";
+
 export const getLoginMutation = () => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -121,10 +123,10 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const pingServer = async (): Promise<Date> => {
-  const localSettings = await AsyncStorage.getItem("localSettings") as string;
+  const localSettings = (await AsyncStorage.getItem("localSettings")) as string;
   let location;
   try {
-    const parsedSettings = JSON.parse(localSettings)
+    const parsedSettings = JSON.parse(localSettings);
     if (parsedSettings.sendLocation) {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
@@ -132,7 +134,7 @@ export const pingServer = async (): Promise<Date> => {
       }
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
   const res = await axios.post(`${apiUrl}/api/user/ping`, location, {
@@ -152,9 +154,12 @@ export const login = async (loginDetails: {
   username: string;
   password: string;
 }): Promise<IUser> => {
-  return axios.post(`${apiUrl}/api/user/login`, loginDetails, {
-    withCredentials: true,
-  });
+  SecureStore.setItemAsync("username", loginDetails.username);
+  SecureStore.setItemAsync("password", loginDetails.password);
+  return axios
+    .post(`${apiUrl}/api/user/login`, loginDetails, {
+      withCredentials: true,
+    });
 };
 
 export const deleteContact = async (id: string) => {
@@ -201,14 +206,14 @@ export const updateContact = async (partialContact: Partial<IContact>) => {
 };
 
 export const getUpdateUserSettingsMutation = async () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const mutation = useMutation(updateUserSettings, {
     onSuccess: (data: IUser) => {
-      queryClient.setQueryData('user', data)
-    }
-  })
-  return mutation
-}
+      queryClient.setQueryData("user", data);
+    },
+  });
+  return mutation;
+};
 
 export const updateUserSettings = async (
   partialSettings: Partial<IUserSettings>
